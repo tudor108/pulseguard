@@ -5,20 +5,20 @@ import { Settings, Building2, BellDot, Shield, KeyRound } from "lucide-react";
 export const Route = createFileRoute("/settings")({
   head: () => ({
     meta: [
-      { title: "Setari — PulseGuard AI" },
-      { name: "description", content: "Configure your hospital, units, notifications, and integrations." },
-      { property: "og:title", content: "Setari — PulseGuard AI" },
-      { property: "og:description", content: "Workspace configuration." },
+      { title: "Setari - PulseGuard AI" },
+      { name: "description", content: "Configureaza spitalul, sectiile, notificarile si integrarile." },
+      { property: "og:title", content: "Setari - PulseGuard AI" },
+      { property: "og:description", content: "Configurare spatiu de lucru." },
     ],
   }),
   component: SetariPage,
 });
 
 const groups = [
-  { icon: Building2, title: "Organization", desc: "St. Mary Health · 1,820 staff · 24 units", action: "Manage" },
-  { icon: BellDot, title: "Notification preferences", desc: "Email, SMS and in-app alerts per severity.", action: "Configure" },
-  { icon: Shield, title: "Privacy & compliance", desc: "HIPAA, SOC 2 audit log, retention policy.", action: "Review" },
-  { icon: KeyRound, title: "Integrations & API keys", desc: "Connect EHR, scheduling, or BI tools.", action: "Connect" },
+  { icon: Building2, title: "Organizatie", desc: "St. Mary Health - 1,820 angajati - 24 unitati", action: "Administreaza" },
+  { icon: BellDot, title: "Preferinte notificari", desc: "Email, SMS si alerte in aplicatie dupa severitate.", action: "Configureaza" },
+  { icon: Shield, title: "Confidentialitate si conformitate", desc: "HIPAA, SOC 2, jurnal audit si politica retentie.", action: "Revizuieste" },
+  { icon: KeyRound, title: "Integrari si chei API", desc: "Conecteaza EHR, planificare sau instrumente BI.", action: "Conecteaza" },
 ];
 
 function SetariPage() {
@@ -26,7 +26,7 @@ function SetariPage() {
     <AppShell>
       <header className="mb-6 animate-fade-up">
         <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground inline-flex items-center gap-2"><Settings className="h-3 w-3" /> Setari</div>
-        <h1 className="mt-2 text-2xl lg:text-3xl font-semibold">Workspace settings</h1>
+        <h1 className="mt-2 text-2xl lg:text-3xl font-semibold">Setari spatiu de lucru</h1>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

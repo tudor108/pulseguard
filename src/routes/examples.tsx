@@ -12,17 +12,17 @@ import type { LucideIcon } from "lucide-react";
 export const Route = createFileRoute("/examples")({
   head: () => ({
     meta: [
-      { title: "Exemple Pregenerate — PulseGuard AI" },
+      { title: "Exemple Pregenerate - PulseGuard AI" },
       { name: "description", content: "Exploreaza scenarii realiste de presiune pe personalul medical si genereaza planuri de interventie asistate de AI." },
-      { property: "og:title", content: "Scenarii pregenerate de risc de epuizare — PulseGuard AI" },
-      { property: "og:description", content: "Library of example workforce scenarios you can load into the dashboard." },
+      { property: "og:title", content: "Scenarii pregenerate de risc de epuizare - PulseGuard AI" },
+      { property: "og:description", content: "Biblioteca de scenarii exemplu care pot fi incarcate in panou." },
     ],
   }),
   component: ExamplesPage,
 });
 
-type RiskLevel = "Critic" | "Ridicat" | "Moderat to Ridicat" | "Moderat";
-type Tag = "ICU" | "Urgente" | "Chirurgie" | "Pediatrie" | "Oncologie" | "Personal weekend" | "Ridicat Risk" | "Moderat Risk";
+type RiskLevel = "Critic" | "Ridicat" | "Moderat spre ridicat" | "Moderat";
+type Tag = "ATI" | "Urgente" | "Chirurgie" | "Pediatrie" | "Oncologie" | "Personal weekend" | "Risc ridicat" | "Risc moderat";
 
 type Scenario = {
   id: string;
@@ -46,80 +46,80 @@ const SCENARIOS: Scenario[] = [
     icon: HeartPulse,
     risk: "Critic",
     riskScore: 86,
-    description: "Repeated night shifts, increased patient acuity, and overtime accumulation create elevated burnout risk.",
-    drivers: ["Overtime", "Night shifts", "Patient acuity"],
-    action: "Add 2 night-shift staff members for 7 days.",
+    description: "Turele de noapte repetate, pacientii cu nevoi ridicate si orele suplimentare cresc riscul de epuizare.",
+    drivers: ["Ore suplimentare", "Ture de noapte", "Acutitate pacienti"],
+    action: "Adauga 2 persoane pe tura de noapte pentru urmatoarele 7 zile.",
     spark: [42, 48, 51, 55, 60, 64, 68, 71, 73, 76, 79, 82, 84, 86],
-    tags: ["ICU", "Ridicat Risk"],
+    tags: ["ATI", "Risc ridicat"],
   },
   {
     id: "er-surge",
-    name: "Departament Urgente Surge",
+    name: "Crestere brusca in Departamentul de Urgente",
     department: "Departament Urgente",
     icon: Siren,
     risk: "Ridicat",
     riskScore: 78,
-    description: "A patient volume surge increases workload pressure and reduces recovery time between shifts.",
-    drivers: ["Patient volume", "Incidents", "Overtime"],
-    action: "Open surge staffing protocol and redistribute senior staff.",
+    description: "Cresterea volumului de pacienti mareste presiunea de lucru si reduce timpul de recuperare intre ture.",
+    drivers: ["Volum pacienti", "Incidente", "Ore suplimentare"],
+    action: "Activeaza protocolul de supraaglomerare si redistribuie personalul senior.",
     spark: [52, 55, 58, 62, 60, 65, 70, 72, 74, 73, 75, 76, 77, 78],
-    tags: ["Urgente", "Ridicat Risk"],
+    tags: ["Urgente", "Risc ridicat"],
   },
   {
     id: "sur-short",
-    name: "Sectie Chirurgie Staff Deficit",
+    name: "Deficit personal in Sectia Chirurgie",
     department: "Sectie Chirurgie",
     icon: Stethoscope,
     risk: "Ridicat",
     riskScore: 72,
-    description: "Reduced staff availability and higher post-operative monitoring needs increase fatigue risk.",
+    description: "Disponibilitatea redusa a personalului si monitorizarea postoperatorie cresc riscul de oboseala.",
     drivers: ["Deficit personal", "Raport pacienti/personal", "Concedii medicale"],
-    action: "Add floating staff and rebalance weekend shifts.",
+    action: "Adauga personal de rezerva si reechilibreaza turele de weekend.",
     spark: [40, 44, 46, 48, 52, 55, 58, 60, 63, 65, 67, 68, 70, 72],
-    tags: ["Chirurgie", "Ridicat Risk"],
+    tags: ["Chirurgie", "Risc ridicat"],
   },
   {
     id: "ped-seasonal",
-    name: "Pediatric Unit Seasonal Pressure",
+    name: "Presiune sezoniera in Pediatrie",
     department: "Pediatrie",
     icon: Baby,
     risk: "Moderat",
     riskScore: 54,
-    description: "Seasonal admission increases create moderate pressure with potential escalation.",
-    drivers: ["Occupancy", "Patient load", "Shift clustering"],
-    action: "Monitor risk daily and prepare temporary support.",
+    description: "Cresterea sezoniera a internarilor produce presiune moderata cu risc de escaladare.",
+    drivers: ["Ocupare", "Volum pacienti", "Ture grupate"],
+    action: "Monitorizeaza riscul zilnic si pregateste sprijin temporar.",
     spark: [30, 33, 36, 40, 42, 44, 47, 49, 50, 52, 53, 54, 54, 55],
-    tags: ["Pediatrie", "Moderat Risk"],
+    tags: ["Pediatrie", "Risc moderat"],
   },
   {
     id: "onc-load",
-    name: "Oncologie Department Emotional Load",
+    name: "Incarcare emotionala in Oncologie",
     department: "Oncologie",
     icon: Activity,
-    risk: "Moderat to Ridicat",
+    risk: "Moderat spre ridicat",
     riskScore: 66,
-    description: "Sustained emotional workload and limited recovery windows create long-term fatigue risk.",
-    drivers: ["Emotional load", "Consecutive shifts", "Scazut recovery time"],
-    action: "Rotate high-intensity assignments and add wellbeing check-ins.",
+    description: "Incarcarea emotionala sustinuta si recuperarea limitata cresc riscul de oboseala pe termen lung.",
+    drivers: ["Incarcare emotionala", "Ture consecutive", "Recuperare redusa"],
+    action: "Roteaza cazurile intense si introdu discutii scurte de sprijin cu echipa.",
     spark: [44, 46, 48, 50, 51, 53, 55, 57, 58, 60, 61, 62, 64, 66],
-    tags: ["Oncologie", "Moderat Risk", "Ridicat Risk"],
+    tags: ["Oncologie", "Risc moderat", "Risc ridicat"],
   },
   {
     id: "weekend",
-    name: "Weekend Understaffing Scenario",
+    name: "Scenariu deficit personal in weekend",
     department: "Multi-sectie",
     icon: CalendarDays,
     risk: "Ridicat",
     riskScore: 74,
-    description: "Weekend coverage gaps create workload concentration among available staff.",
-    drivers: ["Gol de acoperire", "Overtime", "Absenta personal"],
-    action: "Add weekend reserve staff and reduce double shifts.",
+    description: "Golurile de acoperire din weekend concentreaza munca pe personalul disponibil.",
+    drivers: ["Gol de acoperire", "Ore suplimentare", "Absenta personal"],
+    action: "Adauga personal de rezerva in weekend si redu turele duble.",
     spark: [38, 42, 46, 50, 54, 58, 62, 65, 67, 68, 70, 71, 73, 74],
-    tags: ["Personal weekend", "Ridicat Risk"],
+    tags: ["Personal weekend", "Risc ridicat"],
   },
 ];
 
-const FILTERS: Tag[] = ["ICU", "Urgente", "Chirurgie", "Pediatrie", "Oncologie", "Personal weekend", "Ridicat Risk", "Moderat Risk"];
+const FILTERS: Tag[] = ["ATI", "Urgente", "Chirurgie", "Pediatrie", "Oncologie", "Personal weekend", "Risc ridicat", "Risc moderat"];
 
 function riskTone(risk: RiskLevel): "danger" | "warning" {
   return risk === "Critic" || risk === "Ridicat" ? "danger" : "warning";
@@ -127,7 +127,7 @@ function riskTone(risk: RiskLevel): "danger" | "warning" {
 function riskGlowClass(risk: RiskLevel): string {
   if (risk === "Critic") return "risk-critical";
   if (risk === "Ridicat") return "risk-high";
-  if (risk === "Moderat to Ridicat") return "risk-medium";
+  if (risk === "Moderat spre ridicat") return "risk-medium";
   return "risk-low";
 }
 
@@ -158,7 +158,7 @@ function ExamplesPage() {
       }));
     } catch { /* ignore */ }
     toast.success("Scenariul a fost incarcat in spatiul de prognoza", {
-      description: `${s.name} — ${s.department}`,
+      description: `${s.name} - ${s.department}`,
     });
     setTimeout(() => {
       setLoadingId(null);
@@ -172,7 +172,7 @@ function ExamplesPage() {
         id: s.id, name: s.name, department: s.department, riskScore: s.riskScore, ts: Date.now(),
       }));
     } catch { /* ignore */ }
-    toast("Opening report preview", { description: s.name });
+    toast("Se deschide previzualizarea raportului", { description: s.name });
     navigate({ to: "/forecast-report" });
   };
 
@@ -197,16 +197,16 @@ function ExamplesPage() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search scenarios…"
-            aria-label="Search scenarios"
+            placeholder="Cauta scenarii..."
+            aria-label="Cauta scenarii"
             className="flex-1 bg-transparent text-sm placeholder:text-muted-foreground focus:outline-none"
           />
           {query && (
-            <button onClick={() => setQuery("")} className="text-[11px] text-muted-foreground hover:text-foreground transition">Clear</button>
+            <button onClick={() => setQuery("")} className="text-[11px] text-muted-foreground hover:text-foreground transition">Sterge</button>
           )}
         </div>
         <div className="mt-3 flex flex-wrap gap-1.5">
-          <FilterChip label="All" active={active === null} onClick={() => setActive(null)} />
+          <FilterChip label="Toate" active={active === null} onClick={() => setActive(null)} />
           {FILTERS.map((t) => (
             <FilterChip key={t} label={t} active={active === t} onClick={() => setActive(active === t ? null : t)} />
           ))}
@@ -217,7 +217,7 @@ function ExamplesPage() {
       {filtered.length === 0 ? (
         <div className="glass luminous-border rounded-2xl p-10 text-center">
           <Sparkles className="h-5 w-5 mx-auto text-[var(--cyan-glow)]" />
-          <p className="mt-2 text-sm text-muted-foreground">No scenarios match your filters.</p>
+          <p className="mt-2 text-sm text-muted-foreground">Niciun scenariu nu se potriveste filtrelor.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -306,7 +306,7 @@ function ScenarioCard({ s, index, loading, onLoad, onPreview }: {
 
       {/* Drivers */}
       <div className="mt-3">
-        <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground mb-1.5">Factor principals</div>
+        <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground mb-1.5">Factori principali</div>
         <div className="flex flex-wrap gap-1.5">
           {s.drivers.map((d) => (
             <span key={d} className="inline-flex items-center rounded-full border border-border/60 bg-secondary/40 px-2 py-0.5 text-[10px]">
@@ -319,7 +319,7 @@ function ScenarioCard({ s, index, loading, onLoad, onPreview }: {
       {/* Action preview */}
       <div className="mt-3 rounded-lg border border-border/60 bg-secondary/30 p-2.5">
         <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground inline-flex items-center gap-1">
-          <Sparkles className="h-3 w-3 text-[var(--cyan-glow)]" /> Recommended action
+          <Sparkles className="h-3 w-3 text-[var(--cyan-glow)]" /> Actiune recomandata
         </div>
         <p className="mt-0.5 text-xs text-foreground/90 leading-relaxed">{s.action}</p>
       </div>
@@ -327,7 +327,7 @@ function ScenarioCard({ s, index, loading, onLoad, onPreview }: {
       {/* Footer / score + buttons */}
       <div className="mt-4 flex items-center gap-2">
         <div className="text-xs text-muted-foreground">
-          Forecast risk <span className="text-foreground font-semibold tabular-nums">{s.riskScore}/100</span>
+          Risc prognozat <span className="text-foreground font-semibold tabular-nums">{s.riskScore}/100</span>
         </div>
         <div className="ml-auto flex gap-1.5">
           <button
@@ -344,7 +344,7 @@ function ScenarioCard({ s, index, loading, onLoad, onPreview }: {
             {loading
               ? <span className="h-3 w-3 rounded-full border-2 border-background/60 border-t-transparent animate-spin" />
               : <Play className="h-3 w-3 fill-current" />}
-            {loading ? "Loading…" : "Incarca scenariul"}
+            {loading ? "Se incarca..." : "Incarca scenariul"}
           </button>
         </div>
       </div>

@@ -7,10 +7,10 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/staff-load")({
   head: () => ({
     meta: [
-      { title: "Incarcare Personal — PulseGuard AI" },
-      { name: "description", content: "Presiune de lucru and occupancy across every hospital department." },
-      { property: "og:title", content: "Incarcare Personal — PulseGuard AI" },
-      { property: "og:description", content: "Department-level staffing load and occupancy." },
+      { title: "Incarcare Personal - PulseGuard AI" },
+      { name: "description", content: "Presiune de lucru si ocupare pentru fiecare sectie a spitalului." },
+      { property: "og:title", content: "Incarcare Personal - PulseGuard AI" },
+      { property: "og:description", content: "Incarcare de personal si ocupare la nivel de sectie." },
     ],
   }),
   component: StaffLoadPage,
@@ -33,7 +33,7 @@ function StaffLoadPage() {
               <div className="flex items-start justify-between">
                 <div>
                   <h2 className="text-base font-semibold leading-tight">{d.name}</h2>
-                  <p className="text-xs text-muted-foreground mt-0.5">{d.unit} · Lead {d.lead}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{d.unit} - coordonator {d.lead}</p>
                 </div>
                 <span className={cn(
                   "inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-medium border",
@@ -50,7 +50,7 @@ function StaffLoadPage() {
                 <Stat label="Deficit" value={d.shortageRisk} />
               </div>
               <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
-                <span>{d.staff} staff · {d.occupancy}% occupancy</span>
+                <span>{d.staff} angajati - {d.occupancy}% ocupare</span>
                 <span className={cn(
                   "inline-flex items-center gap-1 font-medium",
                   d.trend === "up" ? "text-danger" : d.trend === "down" ? "text-success" : "text-muted-foreground"

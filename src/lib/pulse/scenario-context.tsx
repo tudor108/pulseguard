@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+﻿import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 import type { TimeSeriesInput, ForecastOutput, RiskLevel } from "./services/types";
 import { buildTimeSeries } from "./services/timeseries";
 import { buildForecastOutput } from "./services/forecast";
@@ -42,6 +42,7 @@ export type GeneratScenario = {
   primaryDrivers: RiskDriver[];
   recommendations: ScenarioRecommendation[];
   followUpIndicators: string[];
+  decisionBasis: string[];
   explanation: string;
   expectedImpact: string;
   alerts: ScenarioAlert[];
@@ -60,33 +61,42 @@ function pick<T>(arr: T[], i: number): T { return arr[i % arr.length]; }
 
 function detectContext(prompt: string) {
   const p = prompt.toLowerCase();
+  const occupancyMatch = p.match(/(?:ocupare|gradul de ocupare|occupancy|capacitate)[^\d]{0,30}(\d{2,3})\s*%?/);
+  const patientMatch = p.match(/(\d{2,4})\s*(?:de\s+)?pacienti/);
+  const occupancy = occupancyMatch ? Number(occupancyMatch[1]) : 0;
+  const patientCount = patientMatch ? Number(patientMatch[1]) : 0;
   const dept =
-    /icu|intensive/.test(p) ? "Unitate Terapie Intensiva · Tower B" :
-    /emergency|er\b|ed\b/.test(p) ? "Departament Urgente · Ground Floor" :
-    /surg/.test(p) ? "Sectie Chirurgie · Tower A" :
-    /oncolog/.test(p) ? "Oncologie · Tower A L4" :
-    /pediatr/.test(p) ? "Pediatrie · Tower C" :
-    /maternity/.test(p) ? "Maternitate · Tower C L1" :
-    /psych/.test(p) ? "Psihiatrie · Tower D L2" :
-    "Multi-Department · Hospital-wide";
+    /ati|terapie intensiva|icu|intensive/.test(p) ? "Unitate Terapie Intensiva - Turn B" :
+    /upu|urgente|camera de garda|emergency|er\b|ed\b/.test(p) ? "Departament Urgente - Parter" :
+    /chirurg|surg/.test(p) ? "Sectie Chirurgie - Turn A" :
+    /oncolog/.test(p) ? "Oncologie - Turn A L4" :
+    /pediatr/.test(p) ? "Pediatrie - Turn C" :
+    /maternitate|maternity/.test(p) ? "Maternitate - Turn C L1" :
+    /psihiatr|psych/.test(p) ? "Psihiatrie - Turn D L2" :
+    "Multi-sectie - Spital";
 
-  const nightShift = /night\s*shift|overnight|nocturn/.test(p);
-  const overtime = /overtime|long hours|12h|14h/.test(p);
-  const shortage = /short|underst|vacanc|missing|shortage/.test(p);
-  const surge = /surge|spike|volume|influx|crowd/.test(p);
-  const weekend = /weekend|sat|sun/.test(p);
-  const emotional = /emotion|stress|wellbeing|bereave|moral/.test(p);
+  const nightShift = /ture-\s+de\s+noapte|tura\s+de\s+noapte|nocturn|night\s*shift|overnight/.test(p);
+  const overtime = /ore\s+suplimentare|peste\s+program|overtime|long hours|12h|14h/.test(p);
+  const sickLeave = /concedii\s+medicale?|absente|medical leave|sick leave|sick/.test(p);
+  const shortage = /deficit|lipsa|personal\s+insuficient|subdimensionat|short|underst|vacanc|missing|shortage/.test(p) || sickLeave;
+  const highOccupancy = occupancy >= 90;
+  const highPatientVolume = patientCount >= 100;
+  const surge = /aglomer|supraaglomer|multi\s+pacienti|pacienti\s+multi|volum|crestere|surge|spike|volume|influx|crowd/.test(p) || highOccupancy || highPatientVolume;
+  const weekend = /weekend|sambata|duminica|sat|sun/.test(p);
+  const emotional = /epuizare|burnout|stres|emotional|wellbeing|bereave|moral/.test(p);
 
   let base = 55;
-  if (/critical|high.?risk|severe|overload|crisis/.test(p)) base = 82;
-  else if (/moderate|medium/.test(p)) base = 58;
-  else if (/low|stable|mild/.test(p)) base = 38;
+  if (/critic|risc\s+mare|ridicat|sever|supraincarc|aglomerat|criza|critical|high.-risk|severe|overload|crisis/.test(p)) base = 82;
+  else if (/moderat|mediu|moderate|medium/.test(p)) base = 58;
+  else if (/scazut|stabil|usor|low|stable|mild/.test(p)) base = 38;
   if (nightShift) base += 6;
   if (overtime) base += 7;
   if (shortage) base += 9;
   if (surge) base += 8;
   if (weekend) base += 4;
   if (emotional) base += 3;
+  if (highOccupancy) base += 4;
+  if (sickLeave) base += 3;
   base = Math.min(96, Math.max(22, base));
 
   const riskLevel: RiskLevel =
@@ -95,7 +105,7 @@ function detectContext(prompt: string) {
     base >= 44 ? "moderate" :
     base >= 26 ? "low" : "stable";
 
-  return { dept, riskScore: base, riskLevel, nightShift, overtime, shortage, surge, weekend, emotional };
+  return { dept, riskScore: base, riskLevel, nightShift, overtime, shortage, surge, weekend, emotional, highOccupancy, highPatientVolume, sickLeave, occupancy, patientCount };
 }
 
 export function generateScenario(prompt: string): GeneratScenario {
@@ -132,55 +142,65 @@ export function generateScenario(prompt: string): GeneratScenario {
   });
 
   const drivers: RiskDriver[] = [];
-  if (ctx.overtime) drivers.push({ driverName: "Sustained overtime exposure", severity: "high", explanation: "Average overtime per nurse climbed to 13.4h/week, +28% versus 30-day baseline.", recommendedMitigation: "Cap individual overtime at 8h/week and rotate float-pool staff." });
-  if (ctx.nightShift) drivers.push({ driverName: "Consecutive night-shift density", severity: "critical", explanation: "Six clinicians completed ≥4 consecutive night shifts within the last 10 days.", recommendedMitigation: "Insert 36h recovery buffer after 3 consecutive nights." });
-  if (ctx.shortage) drivers.push({ driverName: "Raport pacienti/personal drift", severity: "high", explanation: "Ratio climbed from 4.4 to 5.6 during peak windows.", recommendedMitigation: "Reassign 2 nurses from float pool for next 7 days." });
-  if (ctx.surge) drivers.push({ driverName: "Patient volume surge", severity: "high", explanation: "Walk-in admissions exceeded weekly forecast by +34%.", recommendedMitigation: "Activate surge protocol and expand triage capacity 22:00–04:00." });
-  if (ctx.emotional) drivers.push({ driverName: "Emotional workload escalation", severity: "medium", explanation: "Scor sondaj stres rose +0.9 points; 4 staff flagged for wellbeing check.", recommendedMitigation: "Schedule 30-min wellbeing check-ins and counselling support." });
-  if (ctx.weekend) drivers.push({ driverName: "Weekend coverage gap", severity: "medium", explanation: "Baseline weekend coverage intersects with elective backlog.", recommendedMitigation: "Activate weekend float pool; defer 2 elective cases to Monday." });
-  if (drivers.length === 0) drivers.push({ driverName: "Compounding workload pressure", severity: "medium", explanation: "Multiple operational indicators trending upward simultaneously.", recommendedMitigation: "Run targeted scenario simulation in the simulator." });
+  if (ctx.overtime) drivers.push({ driverName: "Ore suplimentare peste prag", severity: "high", explanation: "Orele suplimentare sunt peste limita sigura si imping riscul de epuizare in sus.", recommendedMitigation: "Limiteaza orele suplimentare la 8 ore pe saptamana si redistribuie turele." });
+  if (ctx.nightShift) drivers.push({ driverName: "Ture de noapte consecutive", severity: "critical", explanation: "Mai multe ture de noapte la rand reduc timpul de recuperare si cresc oboseala.", recommendedMitigation: "Adauga o pauza de recuperare de 36 ore dupa 3 ture de noapte consecutive." });
+  if (ctx.shortage) drivers.push({ driverName: "Deficit de personal", severity: "high", explanation: "Raportul pacienti personal creste in perioadele de varf.", recommendedMitigation: "Adu personal de rezerva pentru urmatoarele 7 zile." });
+  if (ctx.surge) drivers.push({ driverName: "Volum mare de pacienti", severity: "high", explanation: "Numarul mare de pacienti creste presiunea pe fiecare medic si asistent.", recommendedMitigation: "Activeaza protocolul de supraaglomerare si separa cazurile dupa prioritate." });
+  if (ctx.emotional) drivers.push({ driverName: "Stres operational ridicat", severity: "medium", explanation: "Semnalele de stres si epuizare indica risc de scadere a atentiei.", recommendedMitigation: "Planifica verificari scurte cu echipa si sprijin pentru personalul expus." });
+  if (ctx.weekend) drivers.push({ driverName: "Acoperire slaba in weekend", severity: "medium", explanation: "Acoperirea redusa din weekend se suprapune cu presiune operationala mare.", recommendedMitigation: "Activeaza personal de rezerva pentru weekend." });
+  if (drivers.length === 0) drivers.push({ driverName: "Presiune operationala combinata", severity: "medium", explanation: "Mai multi indicatori operationali cresc in acelasi timp.", recommendedMitigation: "Ruleaza o simulare tintita si verifica turele cu risc." });
 
   const recommendations: ScenarioRecommendation[] = [
-    ctx.nightShift && { title: "Add 2 additional staff members to night shifts for the next 7 days", description: "Reinforce ICU/ED night rotation to relieve tenured staff entering the fatigue band.", priority: "high" as const, expectedImpact: "−12 burnout risk points" },
-    ctx.overtime && { title: "Reduce overtime exposure for staff above 12 hours per week", description: "Cap weekly overtime at 8h and redistribute hours via the float pool.", priority: "high" as const, expectedImpact: "−9 fatigue index points" },
-    ctx.shortage && { title: "Redistribute high-intensity cases across senior staff", description: "Reassign 4 high-acuity patients to senior clinicians and pause low-priority admissions.", priority: "medium" as const, expectedImpact: "−7 shortage risk points" },
-    { title: "Add recovery buffers after consecutive night shifts", description: "Insert mandatory 36-hour recovery window after 3 consecutive overnight rotations.", priority: "medium" as const, expectedImpact: "−6 fatigue index points" },
-    { title: "Review staffing pressure again in 72 hours", description: "Trigger automatic re-forecast and alert if predicted risk crosses 80.", priority: "low" as const, expectedImpact: "Continuous monitoring" },
+    ctx.nightShift && { title: "Adauga personal pe turele de noapte", description: "Acopera urmatoarele 7 zile cu personal suplimentar pe tura de noapte, mai ales in ATI sau UPU.", priority: "high" as const, expectedImpact: "Risc redus cu aproximativ 12 puncte" },
+    ctx.overtime && { title: "Taie orele suplimentare peste 12 ore pe saptamana", description: "Pune plafon la 8 ore suplimentare si muta o parte din sarcina catre personal de rezerva.", priority: "high" as const, expectedImpact: "Oboseala redusa cu aproximativ 9 puncte" },
+    ctx.shortage && { title: "Redistribuie cazurile grele catre personal senior", description: "Imparte cazurile cu intensitate mare intre seniori si amana activitatile cu prioritate mica.", priority: "medium" as const, expectedImpact: "Risc de deficit redus cu aproximativ 7 puncte" },
+    { title: "Introdu pauze reale de recuperare", description: "Dupa ture consecutive de noapte, programeaza o fereastra de recuperare de cel putin 36 ore.", priority: "medium" as const, expectedImpact: "Oboseala redusa cu aproximativ 6 puncte" },
+    { title: "Reverifica riscul peste 72 ore", description: "Ruleaza din nou prognoza si verifica daca riscul trece de 80.", priority: "low" as const, expectedImpact: "Monitorizare continua" },
   ].filter(Boolean) as ScenarioRecommendation[];
 
   const followUpIndicators = [
-    "Ore suplimentare (h)ours per nurse (target ≤ 8h/week)",
-    "Raport pacienti/personal (target ≤ 4.5)",
-    "Scor sondaj stres (re-survey Day 7)",
-    "Sick-leave events (rolling 7-day)",
-    "Night-shift clustering per individual",
-    "Incident report frequency",
-    "Predicted burnout risk (re-forecast 72h)",
+    "Ore suplimentare pe persoana, tinta sub 8 ore pe saptamana",
+    "Raport pacienti personal, tinta sub 4.5",
+    "Scor de stres al echipei, repetat in ziua 7",
+    "Concedii medicale in ultimele 7 zile",
+    "Numar de ture de noapte consecutive",
+    "Frecventa incidentelor raportate",
+    "Risc de epuizare estimat, recalculat peste 72 ore",
   ];
 
-  const verbs = ctx.riskScore >= 70 ? "is escalating sharply" : ctx.riskScore >= 50 ? "is trending upward" : "remains within manageable range";
+  const verbs = ctx.riskScore >= 70 ? "creste rapid" : ctx.riskScore >= 50 ? "este in crestere" : "ramane intr-o zona gestionabila";
   const explanation =
-    `Over the last 14 zile, ${ctx.dept} ${verbs}. ` +
-    `Operational signals show ${ctx.overtime ? "a +28% overtime spike" : "stable overtime"}, ` +
-    `${ctx.shortage ? "patient-to-staff ratio drift to 5.6" : "patient ratio within target band"}, ` +
-    `and ${ctx.emotional ? "rising stress survey scores (+0.9)" : "steady stress survey scores"}. ` +
-    `Historical analogues suggest a ${ctx.riskScore >= 70 ? "9–11" : "14–18"} day window before incident clustering if no intervention is deployed. ` +
-    `Predictive burnout risk reaches ${forecastSeries[forecastSeries.length - 1].predictedEpuizareRisk} by day ${horizon}.`;
+    `Din ce ai descris, ${ctx.dept} ${verbs}. ` +
+    `Am ridicat riscul pentru ca apar semnale combinate: ${ctx.overtime ? "ore suplimentare mari" : "ore suplimentare stabile"}, ` +
+    `${ctx.nightShift ? "ture de noapte consecutive" : "ture fara aglomerare majora"}, ` +
+    `${ctx.surge ? "volum mare de pacienti" : "volum de pacienti in zona normala"} si ` +
+    `${ctx.emotional ? "semnale de stres in echipa" : "stres raportat stabil"}. ` +
+    `Prognoza indica un risc de epuizare de ${forecastSeries[forecastSeries.length - 1].predictedEpuizareRisk} din 100 in ${horizon} zile.`;
 
   const expectedImpact = ctx.riskScore >= 70
-    ? "Without intervention, predicted incident rate increases by ~18% and absenteeism by ~12% within 14 zile."
-    : "Without intervention, fatigue index drifts up by ~6 points within 14 zile; impact remains contained.";
+    ? "Daca nu intervii, ma astept la mai multa oboseala, mai multe greseli operationale si crestere a absentelor in urmatoarele 14 zile."
+    : "Daca nu intervii, oboseala poate creste usor in urmatoarele 14 zile, dar situatia pare inca gestionabila.";
 
   const scenarioName =
-    ctx.nightShift && ctx.overtime ? "Night Shift Overload & Overtime Spike" :
-    ctx.surge ? "Patient Volume Surge Scenario" :
-    ctx.shortage ? "Staff Deficit Pressure Scenario" :
-    ctx.weekend ? "Weekend Understaffing Scenario" :
-    ctx.emotional ? "Emotional Volum de lucru Escalation" :
-    "Generat Risc epuizare Scenario";
+    ctx.nightShift && ctx.overtime ? "Supraincarcare pe ture de noapte si ore suplimentare" :
+    ctx.surge ? "Crestere mare a volumului de pacienti" :
+    ctx.shortage ? "Presiune din deficit de personal" :
+    ctx.weekend ? "Acoperire insuficienta in weekend" :
+    ctx.emotional ? "Crestere a stresului operational" :
+    "Scenariu generat de risc epuizare";
+
+  const decisionBasis = [
+    `Riscul curent calculat este ${ctx.riskScore} din 100.`,
+    `Prognoza pe 14 zile ajunge la ${forecastSeries[forecastSeries.length - 1].predictedEpuizareRisk} din 100.`,
+    ctx.overtime ? "Promptul mentioneaza ore suplimentare, deci am crescut componenta de oboseala." : "Nu ai mentionat ore suplimentare mari.",
+    ctx.nightShift ? "Promptul mentioneaza ture de noapte, un factor important pentru recuperare slaba." : "Nu ai mentionat ture de noapte consecutive.",
+    ctx.highOccupancy ? `Gradul de ocupare detectat este ${ctx.occupancy}%, peste pragul operational de 90%.` : "Nu ai mentionat ocupare peste 90%.",
+    ctx.sickLeave ? "Concediile medicale indica presiune suplimentara pe personalul ramas in tura." : "Nu ai mentionat multe concedii medicale.",
+    ctx.surge ? "Promptul indica aglomerare sau volum mare de pacienti." : "Nu ai mentionat crestere clara de volum pacienti.",
+  ];
 
   const alerts: ScenarioAlert[] = [
-    { title: `${ctx.dept.split(" · ")[0]} risk increased significantly`, severity: ctx.riskScore >= 75 ? "critical" : "warning", department: ctx.dept, primaryDriver: drivers[0].driverName, timestamp: now.toISOString() },
+    { title: `${ctx.dept.split(" - ")[0]} are risc crescut`, severity: ctx.riskScore >= 75 ? "critical" : "warning", department: ctx.dept, primaryDriver: drivers[0].driverName, timestamp: now.toISOString() },
   ];
 
   return {
@@ -200,6 +220,7 @@ export function generateScenario(prompt: string): GeneratScenario {
     primaryDrivers: drivers,
     recommendations,
     followUpIndicators,
+    decisionBasis,
     explanation,
     expectedImpact,
     alerts,
@@ -222,6 +243,3 @@ export function useActiveScenario() {
   if (!ctx) throw new Error("useActiveScenario must be used inside ActiveScenarioProvider");
   return ctx;
 }
-
-
-

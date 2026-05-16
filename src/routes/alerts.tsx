@@ -7,10 +7,10 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/alerts")({
   head: () => ({
     meta: [
-      { title: "Alerte Epuizare — PulseGuard AI" },
-      { name: "description", content: "Real-time alerts on burnout risk, overtime anomalies, and staffing shortages." },
-      { property: "og:title", content: "Alerte Epuizare — PulseGuard AI" },
-      { property: "og:description", content: "Operational alerts across departments." },
+      { title: "Alerte Epuizare - PulseGuard AI" },
+      { name: "description", content: "Alerte live despre risc de epuizare, ore suplimentare si deficit de personal." },
+      { property: "og:title", content: "Alerte Epuizare - PulseGuard AI" },
+      { property: "og:description", content: "Alerte operationale pentru toate sectiile." },
     ],
   }),
   component: AlertsPage,
@@ -28,7 +28,7 @@ function AlertsPage() {
       <header className="mb-6 animate-fade-up">
         <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Alerte Epuizare</div>
         <h1 className="mt-2 text-2xl lg:text-3xl font-semibold">Alerte live</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Sorted by severity. Acknowledge to log a response.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Sortate dupa severitate. Marcheaza o alerta ca citita dupa ce ai verificat-o.</p>
       </header>
 
       <ul className="flex flex-col gap-3">
@@ -49,8 +49,8 @@ function AlertsPage() {
                 <p className="mt-1 text-xs text-muted-foreground">{a.detail}</p>
               </div>
               <div className="flex gap-1.5 self-center">
-                <button className="rounded-md border border-border/60 bg-secondary/40 px-2.5 py-1 text-xs hover:bg-secondary/70 transition">Acknowledge</button>
-                <button className="rounded-md bg-gradient-to-r from-[var(--cyan-glow)] to-[var(--indigo-glow)] px-2.5 py-1 text-xs font-medium text-background">Review</button>
+                <button className="rounded-md border border-border/60 bg-secondary/40 px-2.5 py-1 text-xs hover:bg-secondary/70 transition">Marcheaza citit</button>
+                <button className="rounded-md bg-gradient-to-r from-[var(--cyan-glow)] to-[var(--indigo-glow)] px-2.5 py-1 text-xs font-medium text-background">Verifica</button>
               </div>
             </li>
           );

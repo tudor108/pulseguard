@@ -112,7 +112,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <button
             onClick={() => setCollapsed((c) => !c)}
             className="self-end grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition"
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={collapsed ? "Extinde meniul lateral" : "Restrange meniul lateral"}
           >
             {collapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
           </button>
@@ -156,7 +156,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <div className="mt-auto rounded-xl glass p-3.5 luminous-border">
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <Shield className="h-3.5 w-3.5 text-[var(--cyan-glow)]" />
-                HIPAA-aware · SOC 2
+                HIPAA-aware - SOC 2
               </div>
               <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground/90">
                 Suport decizional operational. Nu este un instrument de diagnostic medical.
@@ -200,18 +200,18 @@ function ProfilMenu() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="group flex items-center gap-2 rounded-full pl-1 pr-2 py-1 hover:bg-secondary/50 transition focus:outline-none focus:ring-2 focus:ring-ring/50" aria-label="Open profile menu">
-        <span className="relative inline-block">
+      <DropdownMenuTrigger className="group flex items-center gap-2 rounded-full pl-1 pr-2 py-1 hover:bg-secondary/50 transition focus:outline-none focus:ring-2 focus:ring-ring/50" aria-label="Deschide meniul de profil">
+        <span className="relative grid h-10 w-10 shrink-0 place-items-center rounded-full ring-2 ring-background/60 transition-all duration-300 group-hover:ring-[var(--cyan-glow)]/80 group-hover:shadow-[0_0_22px_-2px_oklch(0.78_0.18_210/0.75)]">
           <img
             key={coord.name}
             src={coord.avatar}
             alt={coord.name}
-            width={36}
-            height={36}
+            width={40}
+            height={40}
             loading="lazy"
-            className="avatar-swap h-9 w-9 rounded-full object-cover ring-2 ring-background/60 transition-all duration-300 group-hover:ring-[var(--cyan-glow)]/80 group-hover:shadow-[0_0_22px_-2px_oklch(0.78_0.18_210/0.75)] group-hover:scale-105"
+            className="avatar-swap h-full w-full rounded-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
           />
-          <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-success ring-2 ring-background animate-pulse-soft" aria-label="Online" />
+          <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-success ring-2 ring-background animate-pulse-soft" aria-label="Online" />
           <span className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-white/10" />
         </span>
         <div className="hidden xl:block leading-tight text-left max-w-[150px]">
@@ -228,14 +228,14 @@ function ProfilMenu() {
       >
         <DropdownMenuLabel className="flex items-center gap-3 py-2.5 px-2">
           <span className="relative">
-            <img key={coord.name} src={coord.avatar} alt="" width={44} height={44} className="avatar-swap h-11 w-11 rounded-full object-cover ring-2 ring-[var(--cyan-glow)]/40" />
+            <img key={coord.name} src={coord.avatar} alt="" width={48} height={48} className="avatar-swap h-12 w-12 rounded-full object-cover object-center ring-2 ring-[var(--cyan-glow)]/40" />
             <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-success ring-2 ring-background" />
           </span>
           <div className="min-w-0">
             <div className="text-sm font-semibold truncate">{coord.name}</div>
             <div className="text-[11px] text-muted-foreground font-normal truncate">{coord.role}</div>
             <div className="text-[10px] text-[var(--cyan-glow)] font-medium truncate mt-0.5 flex items-center gap-1">
-              <Building2 className="h-2.5 w-2.5" /> {unit} · Workforce Planning
+              <Building2 className="h-2.5 w-2.5" /> {unit} - planificare personal
             </div>
           </div>
         </DropdownMenuLabel>
@@ -292,7 +292,7 @@ function ProfilMenu() {
              theme === "dark" ? <Moon className="h-4 w-4 text-muted-foreground" /> :
              theme === "high-contrast" ? <Contrast className="h-4 w-4 text-muted-foreground" /> :
              <Monitor className="h-4 w-4 text-muted-foreground" />}
-            Theme
+            Tema
             <span className="ml-auto text-[10px] text-muted-foreground">{themeLabel[theme]}</span>
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
@@ -346,19 +346,19 @@ function ContextStrip() {
       <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary/40 px-2 py-0.5">
         <Stethoscope className="h-3 w-3 text-[var(--indigo-glow)]" />
         <span className="text-foreground/90 font-medium">{coord.name}</span>
-        <span className="text-muted-foreground">· {coord.role}</span>
+          <span className="text-muted-foreground">- {coord.role}</span>
       </span>
       {active && (
         <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--cyan-glow)]/40 bg-[var(--cyan-glow)]/10 px-2 py-0.5 animate-fade-up">
           <Sparkles className="h-3 w-3 text-[var(--cyan-glow)]" />
           <span className="text-foreground/90 font-medium truncate max-w-[280px]">Scenariu Activ: {active.name}</span>
-          <span className="text-muted-foreground hidden lg:inline">· {active.riskLevel} · {active.riskScore}/100</span>
-          <button onClick={() => setActive(null)} className="ml-1 text-muted-foreground hover:text-foreground transition" aria-label="Clear active scenario">×</button>
+          <span className="text-muted-foreground hidden lg:inline">- {active.riskLevel} - {active.riskScore}/100</span>
+          <button onClick={() => setActive(null)} className="ml-1 text-muted-foreground hover:text-foreground transition" aria-label="Sterge scenariul activ">x</button>
         </span>
       )}
       <span className="ml-auto inline-flex items-center gap-1.5">
         <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse-soft" />
-        Live signal stream · synced
+        Flux live de semnale - sincronizat
       </span>
     </div>
   );

@@ -13,6 +13,12 @@ set -euo pipefail
 #   AI_AGENT_ENDPOINT (default: empty)
 #   AI_AGENT_API_KEY (default: empty)
 #   AI_AGENT_MODEL (default: empty)
+#   CLOUD_RUN_MEMORY (default: 1Gi)
+#   CLOUD_RUN_CPU (default: 1)
+#   CLOUD_RUN_CONCURRENCY (default: 60)
+#   CLOUD_RUN_MIN_INSTANCES (default: 0)
+#   CLOUD_RUN_MAX_INSTANCES (default: 3)
+#   CLOUD_RUN_TIMEOUT (default: 300)
 
 if [[ -z "${GCP_PROJECT_ID:-}" ]]; then
   echo "Error: GCP_PROJECT_ID is required."
@@ -25,13 +31,19 @@ IMAGE_REPO="${IMAGE_REPO:-pulseguard}"
 IMAGE_TAG="${IMAGE_TAG:-latest}"
 CORS_ORIGIN="${CORS_ORIGIN:-*}"
 USE_AI_SECRET="${USE_AI_SECRET:-false}"
+CLOUD_RUN_MEMORY="${CLOUD_RUN_MEMORY:-1Gi}"
+CLOUD_RUN_CPU="${CLOUD_RUN_CPU:-1}"
+CLOUD_RUN_CONCURRENCY="${CLOUD_RUN_CONCURRENCY:-60}"
+CLOUD_RUN_MIN_INSTANCES="${CLOUD_RUN_MIN_INSTANCES:-0}"
+CLOUD_RUN_MAX_INSTANCES="${CLOUD_RUN_MAX_INSTANCES:-3}"
+CLOUD_RUN_TIMEOUT="${CLOUD_RUN_TIMEOUT:-300}"
 
 IMAGE_URI="${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${IMAGE_REPO}/${CLOUD_RUN_SERVICE}:${IMAGE_TAG}"
 
 echo "Using image: ${IMAGE_URI}"
 
 gcloud config set project "${GCP_PROJECT_ID}"
-gcloud services enable run.googleapis.com artifactregistry.googleapis.com cloudbuild.googleapis.com
+gcloud services enable run.googleapis.com artifactregistry.googleapis.com cloudbuild.googleapis.com secretmanager.googleapis.com
 
 if ! gcloud artifacts repositories describe "${IMAGE_REPO}" --location="${GCP_REGION}" >/dev/null 2>&1; then
   gcloud artifacts repositories create "${IMAGE_REPO}" \
@@ -49,11 +61,13 @@ DEPLOY_ARGS=(
   --platform managed
   --allow-unauthenticated
   --port 8080
-  --memory 512Mi
-  --cpu 1
-  --concurrency 80
-  --min-instances 0
-  --max-instances 3
+  --memory "${CLOUD_RUN_MEMORY}"
+  --cpu "${CLOUD_RUN_CPU}"
+  --concurrency "${CLOUD_RUN_CONCURRENCY}"
+  --min-instances "${CLOUD_RUN_MIN_INSTANCES}"
+  --max-instances "${CLOUD_RUN_MAX_INSTANCES}"
+  --timeout "${CLOUD_RUN_TIMEOUT}"
+  --cpu-boost
   --set-env-vars "NODE_ENV=production,CORS_ORIGIN=${CORS_ORIGIN},API_BASE_URL=${API_BASE_URL:-},AI_AGENT_ENDPOINT=${AI_AGENT_ENDPOINT:-},AI_AGENT_MODEL=${AI_AGENT_MODEL:-}"
 )
 

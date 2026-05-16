@@ -1,11 +1,11 @@
 import type { Recommendation, Report } from "./types";
 
 export const recommendationsMock: Recommendation[] = [
-  { id: "r1", title: "Add 2 nurses to ICU night shift for next 7 days", detail: "Forecast shows fatigue index crossing 75 by Day 4. Reinforce night rotation to relieve tenure staff.", impact: "high", eta: "Tura urmatoare", department: "ICU" },
-  { id: "r2", title: "Cap ER overtime at 8h / week", detail: "Sustained overtime above 12h correlates with +18% incident risk in the last 14 days.", impact: "high", eta: "This week", department: "ER" },
-  { id: "r3", title: "Schedule wellbeing check-ins for Oncologie team", detail: "Stress survey scores rose by 0.9 points; recommend 30-min individual sessions.", impact: "medium", eta: "Within 5 days", department: "Oncologie" },
-  { id: "r4", title: "Redistribute 4 patients from Surgery to Maternity float pool", detail: "Maternity occupancy at 68% — capacity exists to offload pressure from Surgery.", impact: "medium", eta: "48 hours", department: "Surgery" },
-  { id: "r5", title: "Trigger fatigue micro-break protocol in Psychiatry", detail: "Predicted fatigue index reaches 72 within 6 days. Activate 15-min protected breaks.", impact: "low", eta: "Next 72h", department: "Psychiatry" },
+  { id: "r1", title: "Adauga 2 asistenti pe tura de noapte ATI pentru 7 zile", detail: "Prognoza arata ca indicele de oboseala trece de 75 pana in ziua 4. Intareste rotatia de noapte ca sa reduci presiunea pe personalul expus.", impact: "ridicat", eta: "Tura urmatoare", department: "ATI" },
+  { id: "r2", title: "Limiteaza orele suplimentare UPU la 8 ore pe saptamana", detail: "Orele suplimentare peste 12 ore se coreleaza cu risc operational mai mare in ultimele 14 zile.", impact: "ridicat", eta: "Saptamana aceasta", department: "UPU" },
+  { id: "r3", title: "Programeaza verificari de stare pentru echipa Oncologie", detail: "Scorurile de stres au crescut cu 0.9 puncte; recomanda discutii individuale de 30 minute.", impact: "mediu", eta: "In 5 zile", department: "Oncologie" },
+  { id: "r4", title: "Redistribuie 4 pacienti din Chirurgie catre rezerva Maternitate", detail: "Maternitatea are ocupare 68%, deci exista capacitate pentru a reduce presiunea din Chirurgie.", impact: "mediu", eta: "48 ore", department: "Chirurgie" },
+  { id: "r5", title: "Activeaza protocolul de micro-pauze in Psihiatrie", detail: "Indicele de oboseala estimat ajunge la 72 in 6 zile. Activeaza pauze protejate de 15 minute.", impact: "scazut", eta: "Urmatoarele 72h", department: "Psihiatrie" },
 ];
 
 export const reportsMock: Report[] = [
@@ -17,19 +17,19 @@ export const reportsMock: Report[] = [
     confidenceScore: 92,
     riskLevel: "critical",
     executiveSummary:
-      "ICU is projected to cross the critical burnout threshold within 6 days driven by sustained overtime and night-shift clustering. Targeted staffing and recovery interventions can reduce predicted risk by an estimated 18 points over the 14-day horizon.",
+      "ATI este estimata sa treaca pragul critic de epuizare in 6 zile, din cauza orelor suplimentare si a turelor de noapte grupate. Interventiile tintite de personal si recuperare pot reduce riscul estimat cu aproximativ 18 puncte pe 14 zile.",
     primaryDrivers: [
-      { label: "Night-shift clustering", weight: 34 },
-      { label: "Overtime load", weight: 27 },
-      { label: "Patient-to-staff ratio", weight: 21 },
-      { label: "Stress survey signals", weight: 18 },
+      { label: "Ture de noapte grupate", weight: 34 },
+      { label: "Ore suplimentare", weight: 27 },
+      { label: "Raport pacienti/personal", weight: 21 },
+      { label: "Semnale din sondajul de stres", weight: 18 },
     ],
     recommendations: recommendationsMock.slice(0, 3),
     followUpIndicators: [
-      "Daily ICU overtime hours",
-      "Sick-leave events per 7d window",
-      "Stress survey delta vs baseline",
-      "Forecast burnout risk re-run weekly",
+      "Ore suplimentare zilnice ATI",
+      "Concedii medicale pe fereastra de 7 zile",
+      "Diferenta scor stres fata de baza",
+      "Recalculeaza saptamanal riscul de epuizare",
     ],
   },
 ];

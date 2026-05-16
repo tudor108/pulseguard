@@ -17,11 +17,11 @@ export const UNITS = [
 export type Gender = "female" | "male";
 
 export const COORDINATORS = [
-  { name: "Dr. Emily Carter",                role: "Clinical Operations Coordinator", unit: "Unitate Terapie Intensiva",  gender: "female" as Gender, avatar: avatarEmily,     email: "emily.carter@pulseguard.health",  phone: "+1 (415) 555-0142", timezone: "America/Los_Angeles" },
-  { name: "Dr. James Morgan",                role: "Attending Physician",             unit: "Departament Urgente", gender: "male"   as Gender, avatar: avatarMale,      email: "james.morgan@pulseguard.health",  phone: "+1 (212) 555-0188", timezone: "America/New_York" },
-  { name: "Dr. Sofia Bennett",               role: "Department Head",                 unit: "Sectie Chirurgie",        gender: "female" as Gender, avatar: avatarFemaleOps, email: "sofia.bennett@pulseguard.health", phone: "+1 (617) 555-0119", timezone: "America/New_York" },
-  { name: "Nurse Lead Olivia Hayes",         role: "Charge Nurse",                    unit: "Pediatrie",           gender: "female" as Gender, avatar: avatarFemale,    email: "olivia.hayes@pulseguard.health",  phone: "+1 (312) 555-0167", timezone: "America/Chicago" },
-  { name: "Operations Manager Daniel Price", role: "Operations Manager",              unit: "Multi-sectie Prezentare",  gender: "male"   as Gender, avatar: avatarMaleOps,   email: "daniel.price@pulseguard.health",  phone: "+1 (206) 555-0124", timezone: "America/Los_Angeles" },
+  { name: "Dr. Emily Carter",                role: "Coordonator operatiuni clinice", unit: "Unitate Terapie Intensiva",  gender: "female" as Gender, avatar: avatarEmily,     email: "emily.carter@pulseguard.health",  phone: "+1 (415) 555-0142", timezone: "America/Los_Angeles" },
+  { name: "Dr. James Morgan",                role: "Medic coordonator",              unit: "Departament Urgente", gender: "male"   as Gender, avatar: avatarMale,      email: "james.morgan@pulseguard.health",  phone: "+1 (212) 555-0188", timezone: "America/New_York" },
+  { name: "Dr. Sofia Bennett",               role: "Sef departament",                unit: "Sectie Chirurgie",        gender: "female" as Gender, avatar: avatarFemaleOps, email: "sofia.bennett@pulseguard.health", phone: "+1 (617) 555-0119", timezone: "America/New_York" },
+  { name: "Nurse Lead Olivia Hayes",         role: "Asistent sef",                   unit: "Pediatrie",           gender: "female" as Gender, avatar: avatarFemale,    email: "olivia.hayes@pulseguard.health",  phone: "+1 (312) 555-0167", timezone: "America/Chicago" },
+  { name: "Operations Manager Daniel Price", role: "Manager operatiuni",             unit: "Multi-sectie Prezentare",  gender: "male"   as Gender, avatar: avatarMaleOps,   email: "daniel.price@pulseguard.health",  phone: "+1 (206) 555-0124", timezone: "America/Los_Angeles" },
 ] as const;
 
 export type Unit = typeof UNITS[number];

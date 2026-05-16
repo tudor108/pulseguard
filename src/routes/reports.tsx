@@ -7,10 +7,10 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/reports")({
   head: () => ({
     meta: [
-      { title: "Rapoarte — PulseGuard AI" },
-      { name: "description", content: "All generated burnout intelligence reports across departments." },
-      { property: "og:title", content: "Rapoarte — PulseGuard AI" },
-      { property: "og:description", content: "Library of AI-generated workforce reports." },
+      { title: "Rapoarte - PulseGuard AI" },
+      { name: "description", content: "Toate rapoartele generate pentru riscul de epuizare pe sectii." },
+      { property: "og:title", content: "Rapoarte - PulseGuard AI" },
+      { property: "og:description", content: "Biblioteca de rapoarte generate de AI pentru personal." },
     ],
   }),
   component: RapoartePage,
@@ -52,7 +52,7 @@ function RapoartePage() {
                 <div className="h-full rounded-full bg-gradient-to-r from-[var(--cyan-glow)] via-warning to-danger" style={{ width: `${d.burnoutRisk}%` }} />
               </div>
               <div className="mt-4 inline-flex items-center gap-1 text-xs text-[var(--cyan-glow)] group-hover:gap-2 transition-all">
-                Open report <ArrowRight className="h-3 w-3" />
+                Deschide raportul <ArrowRight className="h-3 w-3" />
               </div>
             </Link>
           );

@@ -5,7 +5,7 @@ type Phase = "idle" | "enter" | "hold" | "exit";
 
 /**
  * Cinematic fullscreen route transition.
- * Phases: enter (dim+blur in) → hold (logo + sweep + title) → exit (dissolve).
+ * Phases: enter (dim+blur in) -> hold (logo + sweep + title) -> exit (dissolve).
  * Respects prefers-reduced-motion (simple fade only).
  */
 export function RouteSplash() {
@@ -128,7 +128,7 @@ export function RouteSplash() {
             <span key={i} className="splash-char" style={{ ['--d' as any]: `${i * 28}ms` }}>{ch}</span>
           ))}
         </div>
-        <div className="splash-subtitle">AI · HEALTHCARE INTELLIGENCE</div>
+        <div className="splash-subtitle">AI  -  HEALTHCARE INTELLIGENCE</div>
       </div>
     </div>
   );

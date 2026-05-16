@@ -7,22 +7,23 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/intervention-planner")({
   head: () => ({
     meta: [
-      { title: "Planificator Interventii — PulseGuard AI" },
-      { name: "description", content: "Prioritize and deploy AI-recommended workforce interventions." },
-      { property: "og:title", content: "Planificator Interventii — PulseGuard AI" },
-      { property: "og:description", content: "Plan, approve, and dispatch operational actions." },
+      { title: "Planificator Interventii - PulseGuard AI" },
+      { name: "description", content: "Prioritizeaza si aplica interventii de personal recomandate de AI." },
+      { property: "og:title", content: "Planificator Interventii - PulseGuard AI" },
+      { property: "og:description", content: "Planifica, aproba si trimite actiuni operationale." },
     ],
   }),
   component: PlannerPage,
 });
 
 function PlannerPage() {
+  const impactLabel: Record<string, string> = { high: "ridicat", medium: "mediu", low: "scazut" };
   return (
     <AppShell>
       <header className="mb-6 animate-fade-up">
         <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground inline-flex items-center gap-2"><ClipboardList className="h-3 w-3" /> Planificator Interventii</div>
-        <h1 className="mt-2 text-2xl lg:text-3xl font-semibold">Plan & deploy interventions</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Review AI-recommended actions, approve, and dispatch to department leads.</p>
+        <h1 className="mt-2 text-2xl lg:text-3xl font-semibold">Planifica si aplica interventii</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Revizuieste actiunile recomandate de AI, aproba-le si trimite-le catre coordonatorii de sectie.</p>
       </header>
 
       <div className="glass luminous-border rounded-2xl p-5 animate-fade-up">
@@ -31,7 +32,7 @@ function PlannerPage() {
             <li key={r.id} className="group flex gap-3 rounded-xl border border-border/60 bg-secondary/30 hover:bg-secondary/50 transition p-4">
               <div className={cn(
                 "mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg",
-                r.impact === "high" ? "bg-danger/15 text-danger" : r.impact === "medium" ? "bg-warning/15 text-warning" : "bg-success/15 text-success"
+                r.impact === "ridicat" ? "bg-danger/15 text-danger" : r.impact === "mediu" ? "bg-warning/15 text-warning" : "bg-success/15 text-success"
               )}>
                 <AlertTriangle className="h-4 w-4" />
               </div>
@@ -45,13 +46,13 @@ function PlannerPage() {
                   <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" /> {r.eta}</span>
                   <span className={cn(
                     "inline-flex items-center gap-1",
-                    r.impact === "high" ? "text-danger" : r.impact === "medium" ? "text-warning" : "text-success"
-                  )}>● {r.impact} impact</span>
+                    r.impact === "ridicat" ? "text-danger" : r.impact === "mediu" ? "text-warning" : "text-success"
+                  )}> impact {impactLabel[r.impact] ?? r.impact}</span>
                 </div>
               </div>
               <div className="flex flex-col gap-1.5 self-center">
-                <button className="rounded-md bg-gradient-to-r from-[var(--cyan-glow)] to-[var(--indigo-glow)] px-3 py-1 text-xs font-medium text-background">Approve</button>
-                <button className="rounded-md border border-border/60 bg-secondary/40 px-3 py-1 text-xs hover:bg-secondary/70 transition">Defer</button>
+                <button className="rounded-md bg-gradient-to-r from-[var(--cyan-glow)] to-[var(--indigo-glow)] px-3 py-1 text-xs font-medium text-background">Aproba</button>
+                <button className="rounded-md border border-border/60 bg-secondary/40 px-3 py-1 text-xs hover:bg-secondary/70 transition">Amana</button>
               </div>
             </li>
           ))}

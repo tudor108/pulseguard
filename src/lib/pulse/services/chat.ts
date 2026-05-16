@@ -4,13 +4,13 @@ export const chatMessagesMock: ChatMessage[] = [
   {
     id: "m-system",
     role: "system",
-    content: "PulseGuard AI assistant ready. Ask about burnout risk, staffing, or intervention plans.",
+    content: "Agentul PulseGuard AI este pregatit. Poti intreba despre risc de epuizare, personal sau planuri de interventie.",
     createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
   },
   {
     id: "m-1",
     role: "assistant",
-    content: "Good morning — ICU burnout risk is trending toward 86 over the next 14 days. The main drivers are night-shift clustering and overtime above the 12h soft cap.",
+    content: "Buna dimineata - riscul de epuizare ATI urca spre 86 in urmatoarele 14 zile. Factorii principali sunt turele de noapte grupate si orele suplimentare peste pragul de 12h.",
     createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
   },
 ];

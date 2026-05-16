@@ -52,14 +52,14 @@ export type Department = {
 };
 
 export const departments: Department[] = [
-  { id: "icu", name: "Unitate Terapie Intensiva", unit: "ICU · Tower B", staff: 84, burnoutRisk: 78, fatigueIndex: 71, workloadPressure: 82, shortageRisk: 64, occupancy: 94, trend: "up", delta: 6.4, lead: "Dr. Reyes" },
-  { id: "er",  name: "Departament Urgente", unit: "ER · Ground floor", staff: 112, burnoutRisk: 71, fatigueIndex: 68, workloadPressure: 88, shortageRisk: 58, occupancy: 97, trend: "up", delta: 4.1, lead: "Dr. Okafor" },
-  { id: "onc", name: "Oncologie", unit: "Tower A · L4", staff: 56, burnoutRisk: 62, fatigueIndex: 59, workloadPressure: 64, shortageRisk: 41, occupancy: 81, trend: "stable", delta: 0.6, lead: "Dr. Lindqvist" },
-  { id: "ped", name: "Pediatrie", unit: "Tower C · L2", staff: 64, burnoutRisk: 44, fatigueIndex: 41, workloadPressure: 48, shortageRisk: 30, occupancy: 72, trend: "down", delta: -2.8, lead: "Dr. Haddad" },
-  { id: "sur", name: "Chirurgie", unit: "Tower A · L3", staff: 78, burnoutRisk: 58, fatigueIndex: 55, workloadPressure: 72, shortageRisk: 47, occupancy: 86, trend: "up", delta: 3.2, lead: "Dr. Brennan" },
-  { id: "mat", name: "Maternitate", unit: "Tower C · L1", staff: 48, burnoutRisk: 39, fatigueIndex: 36, workloadPressure: 44, shortageRisk: 22, occupancy: 68, trend: "down", delta: -1.4, lead: "Dr. Kovač" },
-  { id: "rad", name: "Radiologie", unit: "Tower B · L1", staff: 32, burnoutRisk: 51, fatigueIndex: 47, workloadPressure: 58, shortageRisk: 34, occupancy: 74, trend: "stable", delta: 0.9, lead: "Dr. Park" },
-  { id: "psy", name: "Psihiatrie", unit: "Tower D · L2", staff: 38, burnoutRisk: 66, fatigueIndex: 61, workloadPressure: 60, shortageRisk: 52, occupancy: 79, trend: "up", delta: 5.0, lead: "Dr. Almeida" },
+  { id: "icu", name: "Unitate Terapie Intensiva", unit: "ATI - Turn B", staff: 84, burnoutRisk: 78, fatigueIndex: 71, workloadPressure: 82, shortageRisk: 64, occupancy: 94, trend: "up", delta: 6.4, lead: "Dr. Reyes" },
+  { id: "er",  name: "Departament Urgente", unit: "UPU - Parter", staff: 112, burnoutRisk: 71, fatigueIndex: 68, workloadPressure: 88, shortageRisk: 58, occupancy: 97, trend: "up", delta: 4.1, lead: "Dr. Okafor" },
+  { id: "onc", name: "Oncologie", unit: "Turn A - L4", staff: 56, burnoutRisk: 62, fatigueIndex: 59, workloadPressure: 64, shortageRisk: 41, occupancy: 81, trend: "stable", delta: 0.6, lead: "Dr. Lindqvist" },
+  { id: "ped", name: "Pediatrie", unit: "Turn C - L2", staff: 64, burnoutRisk: 44, fatigueIndex: 41, workloadPressure: 48, shortageRisk: 30, occupancy: 72, trend: "down", delta: -2.8, lead: "Dr. Haddad" },
+  { id: "sur", name: "Chirurgie", unit: "Turn A - L3", staff: 78, burnoutRisk: 58, fatigueIndex: 55, workloadPressure: 72, shortageRisk: 47, occupancy: 86, trend: "up", delta: 3.2, lead: "Dr. Brennan" },
+  { id: "mat", name: "Maternitate", unit: "Turn C - L1", staff: 48, burnoutRisk: 39, fatigueIndex: 36, workloadPressure: 44, shortageRisk: 22, occupancy: 68, trend: "down", delta: -1.4, lead: "Dr. Kovac" },
+  { id: "rad", name: "Radiologie", unit: "Turn B - L1", staff: 32, burnoutRisk: 51, fatigueIndex: 47, workloadPressure: 58, shortageRisk: 34, occupancy: 74, trend: "stable", delta: 0.9, lead: "Dr. Park" },
+  { id: "psy", name: "Psihiatrie", unit: "Turn D - L2", staff: 38, burnoutRisk: 66, fatigueIndex: 61, workloadPressure: 60, shortageRisk: 52, occupancy: 79, trend: "up", delta: 5.0, lead: "Dr. Almeida" },
 ];
 
 export type SeriesPoint = {
@@ -137,17 +137,17 @@ export type Recommendation = {
   id: string;
   title: string;
   detail: string;
-  impact: "high" | "medium" | "low";
+  impact: "ridicat" | "mediu" | "scazut";
   eta: string;
   department: string;
 };
 
 export const recommendations: Recommendation[] = [
-  { id: "r1", title: "Add 2 nurses to ICU night shift for next 7 days", detail: "Forecast shows fatigue index crossing 75 by Day 4. Reinforce night rotation to relieve tenure staff.", impact: "high", eta: "Tura urmatoare", department: "ICU" },
-  { id: "r2", title: "Cap ER overtime at 8h / week", detail: "Sustained overtime above 12h correlates with +18% incident risk in the last 14 zile.", impact: "high", eta: "This week", department: "ER" },
-  { id: "r3", title: "Schedule wellbeing check-ins for Oncologie team", detail: "Scor sondaj stress rose by 0.9 points; recommend 30-min individual sessions.", impact: "medium", eta: "Within 5 days", department: "Oncologie" },
-  { id: "r4", title: "Redistribute 4 patients from Chirurgie to Maternitate float pool", detail: "Maternitate occupancy at 68% — capacity exists to offload pressure from Chirurgie.", impact: "medium", eta: "48 hours", department: "Chirurgie" },
-  { id: "r5", title: "Trigger fatigue micro-break protocol in Psihiatrie", detail: "Predicted fatigue index reaches 72 within 6 days. Activate 15-min protected breaks.", impact: "low", eta: "Next 72h", department: "Psihiatrie" },
+  { id: "r1", title: "Adauga 2 asistenti pe tura de noapte ATI pentru 7 zile", detail: "Prognoza arata ca indicele de oboseala trece de 75 pana in ziua 4. Intareste rotatia de noapte ca sa reduci presiunea pe personalul expus.", impact: "ridicat", eta: "Tura urmatoare", department: "ATI" },
+  { id: "r2", title: "Limiteaza orele suplimentare UPU la 8 ore pe saptamana", detail: "Orele suplimentare sustinute peste 12 ore sunt corelate cu risc mai mare de incidente in ultimele 14 zile.", impact: "ridicat", eta: "Saptamana aceasta", department: "UPU" },
+  { id: "r3", title: "Programeaza verificari de stare pentru echipa Oncologie", detail: "Scorul de stres a crescut cu 0.9 puncte; recomanda discutii individuale de 30 minute.", impact: "mediu", eta: "In 5 zile", department: "Oncologie" },
+  { id: "r4", title: "Redistribuie 4 pacienti din Chirurgie catre rezerva Maternitate", detail: "Maternitatea are ocupare 68%, deci exista capacitate pentru a reduce presiunea din Chirurgie.", impact: "mediu", eta: "48 ore", department: "Chirurgie" },
+  { id: "r5", title: "Activeaza protocolul de micro-pauze in Psihiatrie", detail: "Indicele de oboseala estimat ajunge la 72 in 6 zile. Activeaza pauze protejate de 15 minute.", impact: "scazut", eta: "Urmatoarele 72h", department: "Psihiatrie" },
 ];
 
 export type IncidentSignal = {
@@ -159,11 +159,11 @@ export type IncidentSignal = {
 };
 
 export const liveSignals: IncidentSignal[] = [
-  { id: "s1", time: "2 min ago", message: "ICU night-shift overtime spiked +14%", level: "critical", dept: "ICU" },
-  { id: "s2", time: "11 min ago", message: "ER patient-to-staff ratio at 5.8 (target 4.5)", level: "warn", dept: "ER" },
-  { id: "s3", time: "26 min ago", message: "Oncologie stress survey submitted (n=18)", level: "info", dept: "Oncologie" },
-  { id: "s4", time: "48 min ago", message: "Pediatrie fatigue index dropping (-3.1)", level: "info", dept: "Pediatrie" },
-  { id: "s5", time: "1h ago", message: "Psihiatrie sick-leave +2 vs 7-day baseline", level: "warn", dept: "Psihiatrie" },
+  { id: "s1", time: "acum 2 min", message: "Orele suplimentare ATI pe tura de noapte au crescut cu 14%", level: "critical", dept: "ATI" },
+  { id: "s2", time: "acum 11 min", message: "Raport pacienti/personal UPU la 5.8, tinta 4.5", level: "warn", dept: "UPU" },
+  { id: "s3", time: "acum 26 min", message: "Sondajul de stres Oncologie a fost trimis (n=18)", level: "info", dept: "Oncologie" },
+  { id: "s4", time: "acum 48 min", message: "Indicele de oboseala Pediatrie este in scadere (-3.1)", level: "info", dept: "Pediatrie" },
+  { id: "s5", time: "acum 1h", message: "Concedii medicale Psihiatrie +2 fata de baza pe 7 zile", level: "warn", dept: "Psihiatrie" },
 ];
 
 export function riskBand(score: number): { label: string; tone: "success" | "warning" | "danger" | "muted" } {
@@ -184,23 +184,23 @@ export type Scenario = {
 };
 
 export const scenarios: Scenario[] = [
-  { id: "icu-night", name: "Supraincarcare tura de noapte ATI", department: "Intensive Care · Tower B",
-    risk: 82, description: "Sustained overtime and elevated patient-to-nurse ratio across 14 consecutive nights.",
+  { id: "icu-night", name: "Supraincarcare tura de noapte ATI", department: "ATI - Turn B",
+    risk: 82, description: "Ore suplimentare sustinute si raport pacienti/asistent ridicat pe 14 nopti consecutive.",
     spark: [42, 48, 51, 55, 60, 64, 68, 71, 73, 76, 79, 82] },
-  { id: "er-surge", name: "Departament Urgente Surge", department: "ER · Ground floor",
-    risk: 76, description: "Walk-in volume +34% during weekend; triage bottleneck between 22:00–04:00.",
+  { id: "er-surge", name: "Crestere brusca in Departamentul de Urgente", department: "UPU - Parter",
+    risk: 76, description: "Volum pacienti +34% in weekend; blocaj la triaj intre 22:00 si 04:00.",
     spark: [52, 55, 58, 62, 60, 65, 70, 72, 74, 73, 75, 76] },
-  { id: "sur-short", name: "Sectie Chirurgie Staff Deficit", department: "Chirurgie · Tower A",
-    risk: 68, description: "3 scheduled OR teams understaffed by 1 scrub nurse each for 6 days.",
+  { id: "sur-short", name: "Deficit personal in Sectia Chirurgie", department: "Chirurgie - Turn A",
+    risk: 68, description: "3 echipe operatorii planificate au lipsa cate un asistent instrumentar timp de 6 zile.",
     spark: [40, 44, 46, 48, 52, 55, 58, 60, 63, 65, 67, 68] },
-  { id: "ped-seasonal", name: "Pediatric Unit Seasonal Pressure", department: "Pediatrie · Tower C",
-    risk: 54, description: "RSV admissions trending up; predicted +20% beds in the next 10 days.",
+  { id: "ped-seasonal", name: "Presiune sezoniera in Pediatrie", department: "Pediatrie - Turn C",
+    risk: 54, description: "Internarile respiratorii sunt in crestere; estimare +20% paturi in urmatoarele 10 zile.",
     spark: [30, 33, 36, 40, 42, 44, 47, 49, 50, 52, 53, 54] },
-  { id: "onc-load", name: "Oncologie Department Emotional Load", department: "Oncologie · Tower A L4",
-    risk: 62, description: "Scor sondaj stress rose +0.9 points; 4 staff flagged for wellbeing check.",
+  { id: "onc-load", name: "Incarcare emotionala in Oncologie", department: "Oncologie - Turn A L4",
+    risk: 62, description: "Scorul de stres a crescut cu 0.9 puncte; 4 persoane au nevoie de verificare de stare.",
     spark: [44, 46, 48, 50, 51, 53, 55, 57, 58, 60, 61, 62] },
-  { id: "weekend", name: "Weekend Understaffing Scenario", department: "All wards · Sat–Sun",
-    risk: 71, description: "Routine weekend coverage gap intersects with elective surgery backlog.",
+  { id: "weekend", name: "Scenariu deficit personal in weekend", department: "Toate sectiile - Weekend",
+    risk: 71, description: "Golul obisnuit de acoperire in weekend se suprapune cu intarzieri la chirurgiile elective.",
     spark: [38, 42, 46, 50, 54, 58, 62, 65, 67, 68, 70, 71] },
 ];
 
@@ -214,12 +214,12 @@ export type AlertItem = {
 };
 
 export const alerts: AlertItem[] = [
-  { id: "a1", title: "ICU burnout risk crossing critical threshold", detail: "Forecast hits 80 within 6 days at current trajectory.", department: "ICU · Tower B", level: "critical", time: "2 min ago" },
-  { id: "a2", title: "ER overtime exceeding 14h/nurse this week", detail: "5 nurses above the 12h soft cap.", department: "Urgente", level: "critical", time: "18 min ago" },
-  { id: "a3", title: "Oncologie stress survey complete", detail: "18 responses · average score 6.7 (+0.9 vs baseline).", department: "Oncologie", level: "info", time: "1h ago" },
-  { id: "a4", title: "Psihiatrie sick-leave anomaly", detail: "+2 cases vs 7-day baseline; monitor for fatigue spillover.", department: "Psihiatrie", level: "warning", time: "2h ago" },
-  { id: "a5", title: "Maternitate capacity available", detail: "Occupancy at 68%; eligible to absorb 4 transfers.", department: "Maternitate", level: "info", time: "3h ago" },
-  { id: "a6", title: "Chirurgie overtime trending up", detail: "+3.2% vs last week; recommend monitoring.", department: "Chirurgie", level: "warning", time: "5h ago" },
+  { id: "a1", title: "Riscul de epuizare ATI trece pragul critic", detail: "Prognoza ajunge la 80 in 6 zile pe traiectoria curenta.", department: "ATI - Turn B", level: "critical", time: "acum 2 min" },
+  { id: "a2", title: "Ore suplimentare UPU peste 14h/asistent saptamana aceasta", detail: "5 asistenti sunt peste pragul flexibil de 12h.", department: "Urgente", level: "critical", time: "acum 18 min" },
+  { id: "a3", title: "Sondajul de stres Oncologie este complet", detail: "18 raspunsuri - scor mediu 6.7 (+0.9 fata de baza).", department: "Oncologie", level: "info", time: "acum 1h" },
+  { id: "a4", title: "Anomalie concedii medicale in Psihiatrie", detail: "+2 cazuri fata de baza pe 7 zile; monitorizeaza extinderea oboselii.", department: "Psihiatrie", level: "warning", time: "acum 2h" },
+  { id: "a5", title: "Capacitate disponibila in Maternitate", detail: "Ocupare 68%; poate prelua 4 transferuri eligibile.", department: "Maternitate", level: "info", time: "acum 3h" },
+  { id: "a6", title: "Orele suplimentare in Chirurgie sunt in crestere", detail: "+3.2% fata de saptamana trecuta; recomand monitorizare.", department: "Chirurgie", level: "warning", time: "acum 5h" },
 ];
 
 

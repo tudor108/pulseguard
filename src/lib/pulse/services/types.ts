@@ -5,7 +5,7 @@
 
 export type RiskLevel = "stable" | "low" | "moderate" | "elevated" | "critical";
 export type Trend = "up" | "down" | "stable";
-export type Impact = "high" | "medium" | "low";
+export type Impact = "ridicat" | "mediu" | "scazut";
 
 export type Department = {
   id: string;

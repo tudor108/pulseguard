@@ -41,11 +41,11 @@ type ErrorProps = {
 };
 
 const errorPresets: Record<NonNullable<ErrorProps["variant"]>, { icon: LucideIcon; title: string }> = {
-  "invalid-upload":      { icon: FileX,        title: "Invalid file upload" },
-  "forecast-failed":     { icon: AlertTriangle, title: "Forecast generation failed" },
-  "no-data":             { icon: FileQuestion, title: "No data available" },
-  "unsupported-format":  { icon: FileX,        title: "Unsupported time-series format" },
-  "generic":             { icon: AlertTriangle, title: "Something went wrong" },
+  "invalid-upload":      { icon: FileX,        title: "Fisier incarcat invalid" },
+  "forecast-failed":     { icon: AlertTriangle, title: "Prognoza nu a putut fi generata" },
+  "no-data":             { icon: FileQuestion, title: "Nu exista date disponibile" },
+  "unsupported-format":  { icon: FileX,        title: "Format de serii temporale neacceptat" },
+  "generic":             { icon: AlertTriangle, title: "Ceva nu a mers bine" },
 };
 
 export function ErrorState({ title, description, onRetry, className, variant = "generic" }: ErrorProps) {
@@ -63,7 +63,7 @@ export function ErrorState({ title, description, onRetry, className, variant = "
           onClick={onRetry}
           className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-danger/40 bg-background/30 px-3.5 py-2 text-xs font-medium text-danger hover:bg-danger/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/60"
         >
-          <RefreshCcw className="h-3.5 w-3.5" /> Try again
+          <RefreshCcw className="h-3.5 w-3.5" /> Incearca din nou
         </button>
       )}
     </div>

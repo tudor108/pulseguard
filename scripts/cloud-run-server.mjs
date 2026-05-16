@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import { Readable } from "node:stream";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import path from "node:path";
-import { promises as fs } from "node:fs";
+import { existsSync, readFileSync, promises as fs } from "node:fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -10,11 +10,39 @@ const projectRoot = path.resolve(__dirname, "..");
 const serverEntryUrl = pathToFileURL(path.join(projectRoot, "dist/server/index.js")).href;
 const clientDistDir = path.join(projectRoot, "dist/client");
 
+function loadDotEnvFile(fileName) {
+  const filePath = path.join(projectRoot, fileName);
+  if (!existsSync(filePath)) return;
+
+  const content = readFileSync(filePath, "utf8");
+  for (const line of content.split(/\r?\n/)) {
+    const trimmed = line.replace(/^\uFEFF/, "").trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+
+    const match = trimmed.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
+    if (!match) continue;
+
+    const [, key, rawValue] = match;
+    if (process.env[key]) continue;
+    process.env[key] = rawValue.trim().replace(/^["']|["']$/g, "");
+  }
+}
+
+loadDotEnvFile(".env");
+loadDotEnvFile(".env.foundry");
+
 const port = Number(process.env.PORT ?? "8080");
 const host = "0.0.0.0";
 
 const runtimeEnv = {
   CORS_ORIGIN: process.env.CORS_ORIGIN ?? "",
+  FOUNDRY_ENDPOINT: process.env.FOUNDRY_ENDPOINT ?? "",
+  FOUNDRY_API_KEY: process.env.FOUNDRY_API_KEY ?? "",
+  FOUNDRY_MODEL: process.env.FOUNDRY_MODEL ?? "",
+  FOUNDRY_DEPLOYMENT: process.env.FOUNDRY_DEPLOYMENT ?? "",
+  AI_AGENT_ENDPOINT: process.env.AI_AGENT_ENDPOINT ?? "",
+  AI_AGENT_API_KEY: process.env.AI_AGENT_API_KEY ?? "",
+  AI_AGENT_MODEL: process.env.AI_AGENT_MODEL ?? "",
 };
 
 const MIME_TYPES = new Map([

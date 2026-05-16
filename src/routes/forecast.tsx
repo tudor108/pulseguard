@@ -1,4 +1,4 @@
-﻿import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/pulse/AppShell";
 import { ForecastChart, MultiForecastChart } from "@/components/pulse/Charts";
 import { buildForecast } from "@/lib/pulse/data";
@@ -7,9 +7,9 @@ import { ScanLine, Sparkles } from "lucide-react";
 export const Route = createFileRoute("/forecast")({
   head: () => ({
     meta: [
-      { title: "Prognoza AI â€” PulseGuard AI" },
+      { title: "Prognoza AI - PulseGuard AI" },
       { name: "description", content: "Prognoza predictiva pe 14 zile pentru risc de epuizare, presiune de lucru, oboseala si deficit de personal." },
-      { property: "og:title", content: "Prognoza AI â€” PulseGuard AI" },
+      { property: "og:title", content: "Prognoza AI - PulseGuard AI" },
       { property: "og:description", content: "Semnale prospective despre personal." },
     ],
   }),
@@ -27,7 +27,7 @@ function ForecastPage() {
           <p className="mt-1 text-sm text-muted-foreground max-w-2xl">Predictii live ale modelului pentru epuizare, presiune de lucru, oboseala, risc de deficit si urgenta interventiei.</p>
         </div>
         <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-secondary/40 px-3 py-1.5 text-xs">
-          <Sparkles className="h-3 w-3 text-[var(--cyan-glow)]" /> Pulse-v2.4 · Incredere 92%
+          <Sparkles className="h-3 w-3 text-[var(--cyan-glow)]" /> Pulse-v2.4  -  Incredere 92%
         </div>
       </header>
 

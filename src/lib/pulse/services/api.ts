@@ -3,7 +3,7 @@
 // Every UI feature should call these functions. Today they return mock data
 // wrapped in promises so the call sites are already async. To wire a real
 // backend (Supabase / Lovable Cloud / external forecasting API), swap the
-// body of each function — the return types are the contract.
+// body of each function - the return types are the contract.
 
 import type {
   AlertItem,

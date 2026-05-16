@@ -6,7 +6,8 @@ const grid = "oklch(0.97 0.01 230 / 0.06)";
 
 function fmt(d: string) {
   const date = new Date(d);
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const months = ["Ian", "Feb", "Mar", "Apr", "Mai", "Iun", "Iul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${months[date.getMonth()]} ${date.getDate()}`;
 }
 
 function TooltipBox({ active, payload, label }: { active?: boolean; payload?: { color: string; name: string; value: number }[]; label?: string }) {
@@ -145,7 +146,7 @@ export function SignalsChart({ data }: { data: SeriesPoint[] }) {
         <XAxis dataKey="date" tickFormatter={fmt} tick={tickStyle} axisLine={false} tickLine={false} minTickGap={32} />
         <YAxis tick={tickStyle} axisLine={false} tickLine={false} width={40} />
         <Tooltip content={<TooltipBox />} />
-        <Line type="monotone" dataKey="overtime" name="Ore suplimentare (h)ours" stroke="oklch(0.82 0.16 75)" strokeWidth={2} dot={false} isAnimationActive animationDuration={1500} />
+        <Line type="monotone" dataKey="overtime" name="Ore suplimentare (h)" stroke="oklch(0.82 0.16 75)" strokeWidth={2} dot={false} isAnimationActive animationDuration={1500} />
         <Line type="monotone" dataKey="patientRatioScaled" name="Raport pacienti/personal" stroke="oklch(0.82 0.18 210)" strokeWidth={2} dot={false} isAnimationActive animationDuration={1600} />
         <Line type="monotone" dataKey="nightShifts" name="Numar ture noapte" stroke="oklch(0.65 0.22 280)" strokeWidth={2} dot={false} isAnimationActive animationDuration={1700} />
         <Line type="monotone" dataKey="sickLeave" name="Evenimente concediu medical" stroke="oklch(0.68 0.22 20)" strokeWidth={2} dot={false} isAnimationActive animationDuration={1800} />

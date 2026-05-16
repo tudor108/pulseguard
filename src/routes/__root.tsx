@@ -19,16 +19,16 @@ function NotFoundComponent() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">Pagina nu a fost gasita</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+          Pagina cautata nu exista sau a fost mutata.
         </p>
         <div className="mt-6">
           <Link
             to="/"
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Go home
+            Inapoi acasa
           </Link>
         </div>
       </div>
@@ -44,10 +44,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
+          Pagina nu s-a incarcat
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+          Ceva nu a mers bine. Poti reincarca pagina sau te poti intoarce acasa.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -57,13 +57,13 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             }}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Try again
+            Incearca din nou
           </button>
           <a
             href="/"
             className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
           >
-            Go home
+            Inapoi acasa
           </a>
         </div>
       </div>
@@ -76,14 +76,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "PulseGuard AI — Healthcare Workforce Intelligence" },
-      { name: "description", content: "Predict burnout risk, forecast workforce pressure, and deploy AI-guided interventions across your hospital." },
+      { title: "PulseGuard AI - Inteligenta operationala pentru spitale" },
+      { name: "description", content: "Prezice riscul de epuizare, prognozeaza presiunea pe personal si propune interventii ghidate de AI pentru spital." },
       { name: "author", content: "PulseGuard AI" },
-      { property: "og:title", content: "PulseGuard AI — Healthcare Workforce Intelligence" },
-      { property: "og:description", content: "AI command center for hospital operations: burnout forecasting, fatigue index, and staffing recommendations." },
+      { property: "og:title", content: "PulseGuard AI - Inteligenta operationala pentru spitale" },
+      { property: "og:description", content: "Centru AI pentru operatiuni spital: prognoza risc epuizare, indice oboseala si recomandari de personal." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:site", content: "@PulseGuardAI" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -103,7 +103,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="ro" className="dark">
       <head>
         <HeadContent />
       </head>

@@ -1,4 +1,4 @@
-﻿import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { useProfil, getCoordinator, UNITS, COORDINATORS, type Theme } from "@/lib/pulse/profile";
 import { Bell, Camera, FileText, LogOut, Mail, Phone, Shield, Stethoscope, Sun, Moon, Monitor, Contrast, Pencil, Globe, Activity, KeyRound } from "lucide-react";
 import { toast } from "sonner";
@@ -21,8 +21,8 @@ export function ProfilDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
             <SheetDescription className="text-xs">Profil, preferinte si activitate</SheetDescription>
           </SheetHeader>
           <div className="mt-5 flex items-center gap-4">
-            <div className="relative group">
-              <img key={c.name} src={c.avatar} alt={c.name} width={88} height={88} className="avatar-swap h-20 w-20 rounded-2xl object-cover ring-2 ring-[var(--cyan-glow)]/50 shadow-[0_0_30px_-8px_oklch(0.78_0.18_210/0.55)]" />
+            <div className="relative group shrink-0">
+              <img key={c.name} src={c.avatar} alt={c.name} width={96} height={96} className="avatar-swap h-24 w-24 rounded-full object-cover object-center ring-2 ring-[var(--cyan-glow)]/50 shadow-[0_0_30px_-8px_oklch(0.78_0.18_210/0.55)]" />
               <button
                 onClick={() => toast.info("Incarcarea va fi disponibila curand", { description: "Incarcarea pozei de profil este simulata in demo." })}
                 className="absolute -bottom-1 -right-1 grid h-7 w-7 place-items-center rounded-full bg-background border border-border/60 text-foreground hover:bg-secondary transition"

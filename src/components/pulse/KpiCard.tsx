@@ -74,7 +74,7 @@ export function KpiCard({ label, value, unit, delta, trend = "stable", icon: Ico
         {typeof delta === "number" && (
           <div className={cn("inline-flex items-center gap-1 text-xs font-medium", trendColor)}>
             <TrendIcon className="h-3.5 w-3.5" />
-            {delta > 0 ? "+" : ""}{delta}% <span className="text-muted-foreground font-normal">vs 7d</span>
+            {delta > 0 ? "+" : ""}{delta}% <span className="text-muted-foreground font-normal">fata de 7 zile</span>
           </div>
         )}
         {spark && <Sparkline data={spark} />}

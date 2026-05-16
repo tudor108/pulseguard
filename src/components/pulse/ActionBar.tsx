@@ -21,30 +21,30 @@ type AlertCard = {
 };
 
 const CRITICAL_ALERTS: AlertCard[] = [
-  { id: "c-1", severity: "critical", title: "ICU night shift risk increased by 18%",          detail: "Trailing 7-day burnout index breached the critical band on the night rotation.", unit: "Unitate Terapie Intensiva", driver: "Night-shift clustering", time: "12 min ago" },
-  { id: "c-2", severity: "critical", title: "Departament Urgente overtime exceeded threshold", detail: "Average overtime 11.4h / staff / week vs 8h safe target — 5 nurses above soft cap.", unit: "Departament Urgente", driver: "Overtime load", time: "38 min ago" },
-  { id: "c-3", severity: "critical", title: "Sectie Chirurgie has 3 consecutive understaffed shifts", detail: "Nurse-to-patient ratio drifted to 1:7 on the last 3 night rotations.",          unit: "Sectie Chirurgie", driver: "Raport pacienti/personal", time: "1 h ago" },
+  { id: "c-1", severity: "critical", title: "Riscul turei de noapte ATI a crescut cu 18%", detail: "Indicele de epuizare pe ultimele 7 zile a intrat in zona critica pe rotatia de noapte.", unit: "Unitate Terapie Intensiva", driver: "Ture de noapte grupate", time: "acum 12 min" },
+  { id: "c-2", severity: "critical", title: "Orele suplimentare din UPU au trecut pragul", detail: "Media este 11.4 ore pe persoana pe saptamana fata de tinta sigura de 8 ore.", unit: "Departament Urgente", driver: "Ore suplimentare", time: "acum 38 min" },
+  { id: "c-3", severity: "critical", title: "Chirurgia are 3 ture consecutive subdimensionate", detail: "Raportul pacienti personal a ajuns la 1:7 in ultimele 3 rotatii de noapte.", unit: "Sectie Chirurgie", driver: "Raport pacienti/personal", time: "acum 1 h" },
 ];
 
 const WATCHLIST_ALERTS: AlertCard[] = [
-  { id: "w-1", severity: "warning", title: "Presiunea sezoniera in Pediatrie este in crestere",       detail: "Modelul estimeaza +22% internari in urmatoarele 14 zile.",                  unit: "Pediatrie",  driver: "Internari sezoniere", time: "2 h ago" },
-  { id: "w-2", severity: "warning", title: "Oncologie recovery time below recommended buffer",    detail: "Average inter-shift recovery dropped to 9.2h vs 11h target.",                     unit: "Oncologie",    driver: "Recovery buffer",     time: "3 h ago" },
-  { id: "w-3", severity: "warning", title: "Weekend staffing reserve below target",              detail: "Float-pool coverage at 62% vs 80% policy target for Sat–Sun.",                  unit: "Multi-sectie",  driver: "Reserve coverage",    time: "5 h ago" },
+  { id: "w-1", severity: "warning", title: "Presiunea sezoniera in Pediatrie este in crestere", detail: "Modelul estimeaza +22% internari in urmatoarele 14 zile.", unit: "Pediatrie", driver: "Internari sezoniere", time: "acum 2 h" },
+  { id: "w-2", severity: "warning", title: "Oncologia are timp de recuperare sub tinta", detail: "Recuperarea medie intre ture a scazut la 9.2 ore fata de tinta de 11 ore.", unit: "Oncologie", driver: "Recuperare intre ture", time: "acum 3 h" },
+  { id: "w-3", severity: "warning", title: "Rezerva de personal pentru weekend este sub tinta", detail: "Acoperirea cu personal de rezerva este 62% fata de tinta operationala de 80%.", unit: "Multi-sectie", driver: "Acoperire rezerva", time: "acum 5 h" },
 ];
 
 const RECOMMENDED_ACTIONS = [
-  { id: "ra-1", icon: UserPlus,    title: "Add temporary night-shift coverage",                  detail: "Pull 2 nurses from float pool into ICU night rotation for 7 days." },
-  { id: "ra-2", icon: TimerReset,  title: "Reduce overtime for high-exposure staff",             detail: "Cap weekly overtime at 8h for ER nurses currently above the soft cap." },
+  { id: "ra-1", icon: UserPlus,    title: "Adauga acoperire temporara pe tura de noapte", detail: "Muta 2 asistenti din rezerva in rotatia de noapte ATI pentru 7 zile." },
+  { id: "ra-2", icon: TimerReset,  title: "Redu orele suplimentare pentru personalul expus", detail: "Limiteaza orele suplimentare la 8 ore pe saptamana pentru asistentele UPU peste prag." },
   { id: "ra-3", icon: Users,       title: "Redistribuie personalul senior pe turele cu presiune mare", detail: "Reechilibreaza acoperirea seniorilor in ferestrele de noapte ATI, UPU si Chirurgie." },
   { id: "ra-4", icon: RefreshCw,   title: "Reevalueaza riscul peste 72 de ore",                       detail: "Programeaza o reprognoza automata si o revizuire operativa in 72h." },
 ];
 
 const SCENARIOS = [
-  { metric: "Avg. burnout risk (14d)", current: "78%", recommended: "54%", delta: "-24 pts" },
-  { metric: "Night-shift coverage", current: "82%", recommended: "96%", delta: "+14 pts" },
-  { metric: "Ore suplimentare (h)ours / staff / wk", current: "11.4h", recommended: "7.2h", delta: "-4.2h" },
-  { metric: "Oboseala index", current: "0.71", recommended: "0.48", delta: "-0.23" },
-  { metric: "Interventie urgency", current: "Ridicat", recommended: "Moderat", delta: "↓ tier" },
+  { metric: "Risc mediu epuizare 14 zile", current: "78%", recommended: "54%", delta: "-24 pct" },
+  { metric: "Acoperire tura de noapte", current: "82%", recommended: "96%", delta: "+14 pct" },
+  { metric: "Ore suplimentare pe persoana", current: "11.4h", recommended: "7.2h", delta: "-4.2h" },
+  { metric: "Indice oboseala", current: "0.71", recommended: "0.48", delta: "-0.23" },
+  { metric: "Urgenta interventie", current: "Ridicat", recommended: "Moderat", delta: "scade un nivel" },
 ];
 
 export function ActionBar() {
@@ -98,7 +98,7 @@ export function ActionBar() {
   };
   return (
     <>
-      {/* Ruleaza Prognoza — primary glow */}
+      {/* Ruleaza Prognoza - primary glow */}
       <button
         onClick={runForecast}
         disabled={runState === "loading"}
@@ -120,23 +120,23 @@ export function ActionBar() {
         )}
       </button>
 
-      {/* Compara Scenarii — outline */}
+      {/* Compara Scenarii - outline */}
       <button
         onClick={() => setCompareOpen(true)}
         className="hidden lg:inline-flex items-center gap-1.5 rounded-lg border border-[var(--cyan-glow)]/40 bg-background/30 px-2.5 xl:px-3 py-2 text-xs font-medium text-foreground whitespace-nowrap hover:bg-[var(--cyan-glow)]/10 hover:border-[var(--cyan-glow)]/70 active:scale-[0.97] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60"
-        aria-label="Compare scenarios"
+        aria-label="Compara scenarii"
         title="Compara Scenarii"
       >
         <GitCompareArrows className="h-3.5 w-3.5 text-[var(--cyan-glow)]" />
         <span className="hidden xl:inline">Compara Scenarii</span>
-        <span className="xl:hidden">Compare</span>
+        <span className="xl:hidden">Compara</span>
       </button>
 
-      {/* Alert Center — icon w/ animated badge */}
+      {/* Centru alerte */}
       <button
         onClick={() => setAlertsOpen(true)}
         className="relative grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-border/60 bg-secondary/40 hover:bg-secondary/70 hover:border-[var(--cyan-glow)]/60 active:scale-[0.95] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60"
-        aria-label={`${totalAlerts} active burnout alerts`}
+        aria-label={`${totalAlerts} alerte active de epuizare`}
       >
         <BellRing className="h-4 w-4" />
         <span className="absolute top-1 right-1 grid place-items-center h-4 w-4 rounded-full bg-danger text-[9px] font-bold text-background ring-2 ring-background/80">
@@ -145,7 +145,7 @@ export function ActionBar() {
         <span className="absolute top-1 right-1 h-4 w-4 rounded-full bg-danger/60 animate-ping" aria-hidden />
       </button>
 
-      {/* Exportaa Raport — compact */}
+      {/* Exporta raport */}
       <button
         onClick={exportReport}
         disabled={exportState === "loading"}
@@ -153,8 +153,8 @@ export function ActionBar() {
           "hidden md:inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-secondary/40 px-2.5 py-2 text-xs font-medium whitespace-nowrap hover:bg-secondary/70 active:scale-[0.97] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
           exportState === "success" && "border-success/60 text-success"
         )}
-        aria-label="Exporta report"
-        title="Exportaa Raport"
+        aria-label="Exporta raport"
+        title="Exporta raport"
       >
         {exportState === "loading" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> :
          exportState === "success" ? <CheckCircle2 className="h-3.5 w-3.5" /> :
@@ -200,7 +200,7 @@ export function ActionBar() {
           <DialogFooter>
             <button onClick={() => setCompareOpen(false)} className="rounded-lg px-3 py-2 text-xs text-muted-foreground hover:text-foreground transition">Inchide</button>
             <button
-              onClick={() => { setCompareOpen(false); toast.success("Recommended plan applied to simulator"); }}
+              onClick={() => { setCompareOpen(false); toast.success("Planul recomandat a fost aplicat in simulator"); }}
               className="btn-glow inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[var(--cyan-glow)] to-[var(--indigo-glow)] px-3.5 py-2 text-xs font-semibold text-background ring-glow"
             >
               <CheckCircle2 className="h-3.5 w-3.5" /> Aplica Plan Recomandat
@@ -225,7 +225,7 @@ export function ActionBar() {
                   Centru Alerte Epuizare
                 </SheetTitle>
                 <SheetDescription className="mt-1 text-xs">
-                  Live operational risk signals · {totalAlerts} active
+                  Semnale live de risc operational - {totalAlerts} active
                 </SheetDescription>
               </div>
               <div className={cn(
@@ -271,7 +271,7 @@ export function ActionBar() {
               icon={<Eye className="h-3.5 w-3.5" />}
             >
               {watchlist.length === 0 ? (
-                <EmptyRow label="Lista monitorizare is clear." />
+                <EmptyRow label="Lista de monitorizare este curata." />
               ) : (
                 watchlist.map((a, i) => (
                   <AlertCardView
@@ -325,7 +325,7 @@ export function ActionBar() {
             <button
               onClick={() => {
                 setCritical([]); setWatchlist([]);
-                toast.success("All alerts acknowledged");
+                toast.success("Toate alertele au fost marcate ca citite");
               }}
               className="text-xs text-muted-foreground hover:text-foreground transition"
             >
@@ -389,7 +389,7 @@ function AlertCardView({
     alert.severity === "critical"
       ? { label: "Critic", text: "text-danger", chip: "bg-danger/15 text-danger border-danger/40", ring: "before:bg-danger" }
       : alert.severity === "warning"
-      ? { label: "Watch",    text: "text-warning", chip: "bg-warning/15 text-warning border-warning/40", ring: "before:bg-warning" }
+      ? { label: "Atentie", text: "text-warning", chip: "bg-warning/15 text-warning border-warning/40", ring: "before:bg-warning" }
       : { label: "Info",     text: "text-[var(--cyan-glow)]", chip: "bg-[var(--cyan-glow)]/15 text-[var(--cyan-glow)] border-[var(--cyan-glow)]/40", ring: "before:bg-[var(--cyan-glow)]" };
 
   return (
@@ -418,7 +418,7 @@ function AlertCardView({
         </div>
         <button
           onClick={onDismiss}
-          aria-label="Dismiss alert"
+          aria-label="Elimina alerta"
           className="opacity-60 hover:opacity-100 hover:text-foreground text-muted-foreground rounded-md p-1 hover:bg-secondary/70 transition"
         >
           <X className="h-3.5 w-3.5" />
@@ -435,7 +435,7 @@ function AlertCardView({
 
       <div className="mt-3 flex items-center gap-2">
         <button
-          onClick={() => toast.success("Deschidere prognoza", { description: `${alert.unit} · vizualizare 14 zile` })}
+          onClick={() => toast.success("Deschidere prognoza", { description: `${alert.unit} - vizualizare 14 zile` })}
           className="inline-flex items-center gap-1 rounded-md border border-border/60 bg-background/40 px-2 py-1 text-[10.5px] font-medium hover:bg-[var(--cyan-glow)]/10 hover:border-[var(--cyan-glow)]/50 transition"
         >
           <LineChart className="h-3 w-3" /> Vezi Prognoza
