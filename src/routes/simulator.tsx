@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/pulse/AppShell";
 import { AnimatedNumber } from "@/components/pulse/AnimatedNumber";
@@ -22,9 +22,9 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/simulator")({
   head: () => ({
     meta: [
-      { title: "Simulator Scenarii — PulseGuard AI" },
-      { name: "description", content: "Simulate staffing changes, overtime caps, and shift redistribution against the burnout forecast." },
-      { property: "og:title", content: "Simulator Scenarii — PulseGuard AI" },
+      { title: "Simulator Scenarii â€” PulseGuard AI" },
+      { name: "description", content: "Simuleaza modificari de personal, limitari ale orelor suplimentare si redistribuirea turelor fata de prognoza de epuizare." },
+      { property: "og:title", content: "Simulator Scenarii â€” PulseGuard AI" },
       { property: "og:description", content: "What-if planning for hospital operations." },
     ],
   }),
@@ -112,7 +112,7 @@ function SimulatorPage() {
 
   const apply = () => {
     toast.success("Scenario applied to Raport Prognoza", {
-      description: `+${tempStaff} staff · −${otReduction}% OT · ${horizon}-day horizon`,
+      description: `+${tempStaff} staff Â· âˆ’${otReduction}% OT Â· ${horizon}-day horizon`,
     });
     setTimeout(() => navigate({ to: "/forecast-report" }), 400);
   };
@@ -172,7 +172,7 @@ function SimulatorPage() {
             <Slider value={[tempStaff]} onValueChange={(v) => setTempStaff(v[0])} min={0} max={10} step={1} />
           </ControlBlock>
 
-          <ControlBlock label="Reduce overtime target" value={`−${otReduction}%`}>
+          <ControlBlock label="Reduce overtime target" value={`âˆ’${otReduction}%`}>
             <Slider value={[otReduction]} onValueChange={(v) => setOtReduction(v[0])} min={0} max={50} step={5} />
           </ControlBlock>
 
@@ -239,14 +239,14 @@ function SimulatorPage() {
             />
             <KpiTile
               label="Expected reduction"
-              value={<>−<AnimatedNumber value={reductionPct} />%</>}
+              value={<>âˆ’<AnimatedNumber value={reductionPct} />%</>}
               tone="cyan"
               icon={<TrendingDown className="h-3.5 w-3.5" />}
               caption={`${beforeRisk - afterRisk} pts absolute`}
               shimmer={recalculating}
             />
             <KpiTile
-              label="Confidence"
+              label="Incredere"
               value={<><AnimatedNumber value={confidence} />%</>}
               tone="indigo"
               icon={<Sparkles className="h-3.5 w-3.5" />}
@@ -261,7 +261,7 @@ function SimulatorPage() {
               icon={<DollarSign className="h-3.5 w-3.5" />}
               label="Impact cost personal"
               level={costLevel}
-              detail={costLevel === "low" ? "Within current budget envelope" : costLevel === "moderate" ? "+$8.4k / 14 days est." : "+$18.2k / 14 days est."}
+              detail={costLevel === "low" ? "Within current budget envelope" : costLevel === "moderate" ? "+$8.4k / 14 zile est." : "+$18.2k / 14 zile est."}
             />
             <BadgeTile
               icon={<CheckCircle2 className="h-3.5 w-3.5" />}
@@ -278,7 +278,7 @@ function SimulatorPage() {
           </div>
 
           {/* Before vs After chart */}
-          <Card title="Before vs. After — burnout risk forecast" shimmer={recalculating}>
+          <Card title="Before vs. After â€” burnout risk forecast" shimmer={recalculating}>
             <ResponsiveContainer width="100%" height={280}>
               <ComposedChart data={chartData} margin={{ top: 10, right: 12, left: -10, bottom: 0 }}>
                 <defs>
@@ -306,7 +306,7 @@ function SimulatorPage() {
                 <ResponsiveContainer width="100%" height={260}>
                   <BarChart data={barData} margin={{ top: 8, right: 12, left: -10, bottom: 0 }} barGap={4}>
                     <CartesianGrid stroke={grid} strokeDasharray="3 3" vertical={false} />
-                    <XAxis dataKey="name" tick={{ ...tickStyle, fontSize: 10 }} tickLine={false} axisLine={false} interval={0} tickFormatter={(s: string) => s.length > 14 ? s.slice(0, 13) + "…" : s} />
+                    <XAxis dataKey="name" tick={{ ...tickStyle, fontSize: 10 }} tickLine={false} axisLine={false} interval={0} tickFormatter={(s: string) => s.length > 14 ? s.slice(0, 13) + "â€¦" : s} />
                     <YAxis tick={tickStyle} tickLine={false} axisLine={false} domain={[0, 100]} />
                     <Tooltip contentStyle={{ background: "transparent", border: "none" }} cursor={{ fill: "oklch(0.78 0.18 210 / 0.06)" }} />
                     <Legend iconType="circle" wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
@@ -328,7 +328,7 @@ function SimulatorPage() {
                       <li key={d.name} className="rounded-lg border border-border/50 bg-secondary/20 p-2.5">
                         <div className="flex items-center justify-between text-xs">
                           <span className="font-medium">{d.name}</span>
-                          <span className="text-success font-semibold tabular-nums">−{pct}%</span>
+                          <span className="text-success font-semibold tabular-nums">âˆ’{pct}%</span>
                         </div>
                         <div className="mt-1.5 h-1.5 rounded-full bg-secondary/60 overflow-hidden">
                           <div className="h-full bg-gradient-to-r from-success to-[var(--cyan-glow)] transition-all duration-700" style={{ width: `${pct}%` }} />
@@ -371,10 +371,10 @@ function SimulatorPage() {
             <div className="mt-4 flex flex-wrap gap-2">
               <button onClick={apply} className="btn-glow inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[var(--cyan-glow)] to-[var(--indigo-glow)] px-3.5 py-2 text-xs font-semibold text-background ring-glow active:scale-[0.97]">
                 {recalculating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Play className="h-3.5 w-3.5 fill-current" />}
-                Aplica Scenario to Report
+                Aplica scenariul la raport
               </button>
               <button onClick={save} className="inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-secondary/40 px-3.5 py-2 text-xs font-medium hover:bg-secondary/70 transition active:scale-[0.97]">
-                <Save className="h-3.5 w-3.5" /> Salveaza Scenariul
+                <Save className="h-3.5 w-3.5" /> Save Scenariul
               </button>
             </div>
           </Card>
@@ -461,5 +461,7 @@ function Card({ title, children, shimmer, accent }: { title: string; children: R
     </div>
   );
 }
+
+
 
 

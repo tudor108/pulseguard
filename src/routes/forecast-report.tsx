@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/pulse/AppShell";
 import { ForecastChart, SignalsChart } from "@/components/pulse/Charts";
 import { buildForecast, buildSeries, recommendations, riskBand } from "@/lib/pulse/data";
@@ -13,9 +13,9 @@ import {
 export const Route = createFileRoute("/forecast-report")({
   head: () => ({
     meta: [
-      { title: "Raport Prognoza — PulseGuard AI" },
+      { title: "Raport Prognoza â€” PulseGuard AI" },
       { name: "description", content: "Full AI-generated burnout report with input signals, 14-day forecast, and recommended actions." },
-      { property: "og:title", content: "Raport Prognoza — PulseGuard AI" },
+      { property: "og:title", content: "Raport Prognoza â€” PulseGuard AI" },
       { property: "og:description", content: "End-to-end burnout intelligence report." },
     ],
   }),
@@ -23,35 +23,35 @@ export const Route = createFileRoute("/forecast-report")({
 });
 
 const GEN_STEPS = [
-  "Reading workload time-series…",
-  "Detecting fatigue patterns…",
-  "Forecasting 14-day burnout risk…",
-  "Generating intervention plan…",
+  "Reading workload time-seriesâ€¦",
+  "Detecting fatigue patternsâ€¦",
+  "Forecasting 14-day burnout riskâ€¦",
+  "Generating intervention planâ€¦",
 ];
 
 const drivers = [
   { id: "overtime", label: "Overtime accumulation", severity: 88, icon: Flame, tone: "danger",
-    explain: "Cumulative overtime climbed +22% over the last 14 days, with 9 staff above the 12h weekly soft cap.",
+    explain: "Cumulative overtime climbed +22% over the last 14 zile, with 9 staff above the 12h weekly soft cap.",
     mitigation: "Cap individual overtime at 8h/week and redistribute load to the float pool." },
   { id: "nights", label: "Night shift clustering", severity: 81, icon: MoonStar, tone: "danger",
-    explain: "Six individuals worked ≥4 consecutive nights, compounding circadian fatigue indicators.",
+    explain: "Six individuals worked â‰¥4 consecutive nights, compounding circadian fatigue indicators.",
     mitigation: "Insert a mandatory 36h recovery buffer after every 3 consecutive nights." },
   { id: "load", label: "Patient load increase", severity: 74, icon: Users, tone: "warning",
-    explain: "Patient-to-staff ratio rose from 4.4 to 5.1 (+16%) across ICU and ER.",
-    mitigation: "Transfer 4 eligible patients from Surgery to the Maternity float pool." },
+    explain: "Raport pacienti/personal rose from 4.4 to 5.1 (+16%) across ICU and ER.",
+    mitigation: "Transfer 4 eligible patients from Chirurgie to the Maternitate float pool." },
   { id: "recovery", label: "Reduced recovery time", severity: 67, icon: BatteryLow, tone: "warning",
     explain: "Median inter-shift rest dropped to 9.2h, below the 11h policy target on 18% of rotations.",
     mitigation: "Block scheduling within 11h of the prior shift end across all wards." },
-  { id: "absence", label: "Staff absence trend", severity: 58, icon: UserMinus, tone: "warning",
-    explain: "Sick-leave incidence rose +2 cases vs the 7-day baseline, concentrated in Psychiatry and ICU.",
+  { id: "absence", label: "Absenta personal trend", severity: 58, icon: UserMinus, tone: "warning",
+    explain: "Sick-leave incidence rose +2 cases vs the 7-day baseline, concentrated in Psihiatrie and ICU.",
     mitigation: "Activate on-call pool and trigger wellbeing check-ins within 48h." },
 ] as const;
 
 const followUps = [
   "Overtime above threshold",
-  "Stress survey score increase",
+  "Scor sondaj stres increase",
   "Absenteeism trend",
-  "Patient-to-staff ratio",
+  "Raport pacienti/personal",
   "Consecutive night shifts",
   "Incident report frequency",
   "Recovery time between shifts",
@@ -67,15 +67,15 @@ const actions = [
 ];
 
 const comparison = [
-  { metric: "Burnout Risk",        current: "78 / 100", recommended: "62 / 100", impact: "−16 pts", positive: true },
-  { metric: "Overtime Hours",      current: "14.2 h/wk", recommended: "8.0 h/wk",  impact: "−44%",   positive: true },
-  { metric: "Staff Deficit Risk", current: "64 / 100", recommended: "48 / 100", impact: "−16 pts", positive: true },
-  { metric: "Fatigue Index",       current: "71 / 100", recommended: "58 / 100", impact: "−13 pts", positive: true },
-  { metric: "Interventie Urgency",current: "58 / 100", recommended: "34 / 100", impact: "−24 pts", positive: true },
+  { metric: "Risc epuizare",        current: "78 / 100", recommended: "62 / 100", impact: "âˆ’16 pts", positive: true },
+  { metric: "Overtime Hours",      current: "14.2 h/wk", recommended: "8.0 h/wk",  impact: "âˆ’44%",   positive: true },
+  { metric: "Risc deficit personal", current: "64 / 100", recommended: "48 / 100", impact: "âˆ’16 pts", positive: true },
+  { metric: "Oboseala Index",       current: "71 / 100", recommended: "58 / 100", impact: "âˆ’13 pts", positive: true },
+  { metric: "Interventie Urgency",current: "58 / 100", recommended: "34 / 100", impact: "âˆ’24 pts", positive: true },
 ];
 
 function ReportPage() {
-  const unit = "ICU · Tower B";
+  const unit = "ICU Â· Tower B";
   const coordinator = "Dr. Elena Rivera";
   const risk = 78;
   const band = riskBand(risk);
@@ -104,13 +104,13 @@ function ReportPage() {
       {/* 1. Report header */}
       <header className="mb-5 animate-stagger">
         <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground inline-flex items-center gap-2">
-          <Sparkles className="h-3 w-3 text-[var(--cyan-glow)]" /> AI-generated · Pulse-v2.4
+          <Sparkles className="h-3 w-3 text-[var(--cyan-glow)]" /> AI-generated Â· Pulse-v2.4
         </div>
         <h1 className="mt-2 text-2xl lg:text-3xl font-semibold leading-tight">
-          Burnout Risk Forecast &amp; Interventie Report
+          Risc epuizare Forecast &amp; Interventie Report
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          End-to-end operational read on workforce strain with a 14-day forward projection and intervention plan.
+          Analiza operationala completa a presiunii pe personal, cu proiectie pe 14 zile si plan de interventie.
         </p>
       </header>
 
@@ -121,11 +121,11 @@ function ReportPage() {
           <Divider />
           <Meta label="Coordinator" value={coordinator} />
           <Divider />
-          <Meta label="Generated" value={<span suppressHydrationWarning>{stamp || "just now"}</span>} />
+          <Meta label="Generat" value={<span suppressHydrationWarning>{stamp || "chiar acum"}</span>} />
           <Divider />
-          <Meta label="Orizont prognoza" value="14 days" />
+          <Meta label="Orizont prognoza" value="14 zile" />
           <Divider />
-          <Meta label="Confidence" value="92%" />
+          <Meta label="Incredere" value="92%" />
           <Divider />
           <span className={cn(
             "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium border",
@@ -134,22 +134,22 @@ function ReportPage() {
             band.tone === "success" && "bg-success/15 text-success border-success/30",
             band.tone === "muted"   && "bg-secondary/50 text-muted-foreground border-border/60",
           )}>
-            <ShieldAlert className="h-3.5 w-3.5" /> {band.label} risk · {risk}/100
+            <ShieldAlert className="h-3.5 w-3.5" /> {band.label} risk Â· {risk}/100
           </span>
           <div className="ml-auto flex flex-wrap gap-2">
             <button onClick={regenerate} disabled={generating}
               className="btn-glow inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[var(--cyan-glow)] to-[var(--indigo-glow)] px-3 py-1.5 text-xs font-semibold text-background ring-glow disabled:opacity-70">
               {generating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Play className="h-3.5 w-3.5 fill-current" />}
-              {generating ? "Generating…" : "Regenerate"}
+              {generating ? "Generatingâ€¦" : "Regenerate"}
             </button>
             <button className="btn-glow inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-secondary/40 px-3 py-1.5 text-xs hover:bg-secondary/70 transition">
               <Download className="h-3.5 w-3.5" /> Exporta PDF
             </button>
             <button className="btn-glow inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-secondary/40 px-3 py-1.5 text-xs hover:bg-secondary/70 transition">
-              <Share2 className="h-3.5 w-3.5" /> Share Report
+              <Share2 className="h-3.5 w-3.5" /> Distribuie raportul
             </button>
             <button className="btn-glow inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-secondary/40 px-3 py-1.5 text-xs hover:bg-secondary/70 transition">
-              <Save className="h-3.5 w-3.5" /> Salveaza Scenariul
+              <Save className="h-3.5 w-3.5" /> Save Scenariul
             </button>
           </div>
         </div>
@@ -180,7 +180,7 @@ function ReportPage() {
               <Sparkles className="h-4 w-4 text-background" />
             </div>
             <p className="text-sm lg:text-base leading-relaxed text-foreground/90">
-              The forecast indicates a <strong className="text-danger">high probability of burnout escalation</strong> over the next 14 days,
+              The forecast indicates a <strong className="text-danger">high probability of burnout escalation</strong> over the next 14 zile,
               mainly driven by overtime accumulation, night-shift clustering, and an increased patient-to-staff ratio.
               <span className="text-foreground/75"> Immediate workload redistribution and temporary staffing support are recommended.</span>
             </p>
@@ -195,14 +195,14 @@ function ReportPage() {
       </Section>
 
       {/* 3. Input time-series */}
-      <Section eyebrow="Historical signals · last 30 days" title="Historical Operational Pressure Signals" delay={0.18}>
+      <Section eyebrow="Historical signals Â· last 30 days" title="Historical Operational Pressure Signals" delay={0.18}>
         <div className="glass luminous-border rounded-2xl p-5">
           <SignalsChart data={series} />
         </div>
       </Section>
 
       {/* 4. Predictive time-series */}
-      <Section eyebrow="Predictive forecast · +14 days" title="14-Day Burnout Risk Forecast" delay={0.26}>
+      <Section eyebrow="Predictive forecast Â· +14 zile" title="14-Day Risc epuizare Forecast" delay={0.26}>
         <div className="glass luminous-border rounded-2xl p-5">
           <ForecastChart data={forecast} />
           <p className="mt-3 text-xs text-muted-foreground">
@@ -212,8 +212,8 @@ function ReportPage() {
         </div>
       </Section>
 
-      {/* 5. Driver analysis */}
-      <Section eyebrow="Driver analysis" title="Primary Risk Drivers" delay={0.34}>
+      {/* 5. Analiza factori */}
+      <Section eyebrow="Analiza factori" title="Factori principali de risc" delay={0.34}>
         <ol className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
           {drivers.map((d, i) => {
             const Icon = d.icon;
@@ -288,8 +288,8 @@ function ReportPage() {
         </ul>
       </Section>
 
-      {/* 8. Scenario comparison */}
-      <Section eyebrow="Scenario comparison" title="Plan Curent vs Plan Recomandat" delay={0.58}>
+      {/* 8. Comparatie scenarii */}
+      <Section eyebrow="Comparatie scenarii" title="Plan Curent vs Plan Recomandat" delay={0.58}>
         <div className="glass luminous-border rounded-2xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -373,5 +373,7 @@ function Stat({ label, value, tone }: { label: string; value: string; tone?: "da
     </div>
   );
 }
+
+
 
 

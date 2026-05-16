@@ -22,7 +22,7 @@ function RapoartePage() {
       <header className="mb-6 animate-fade-up">
         <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Rapoarte</div>
         <h1 className="mt-2 text-2xl lg:text-3xl font-semibold">Rapoarte generate</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Latest AI-generated forecast & intervention reports per medical unit.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Ultimele rapoarte de prognoza si interventie generate de AI pentru fiecare unitate medicala.</p>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -61,4 +61,5 @@ function RapoartePage() {
     </AppShell>
   );
 }
+
 

@@ -13,8 +13,8 @@ export const Route = createFileRoute("/examples")({
   head: () => ({
     meta: [
       { title: "Exemple Pregenerate — PulseGuard AI" },
-      { name: "description", content: "Explore realistic healthcare workforce pressure scenarios and generate AI-powered intervention plans." },
-      { property: "og:title", content: "Pregenerated Burnout Risk Scenarios — PulseGuard AI" },
+      { name: "description", content: "Exploreaza scenarii realiste de presiune pe personalul medical si genereaza planuri de interventie asistate de AI." },
+      { property: "og:title", content: "Scenarii pregenerate de risc de epuizare — PulseGuard AI" },
       { property: "og:description", content: "Library of example workforce scenarios you can load into the dashboard." },
     ],
   }),
@@ -22,7 +22,7 @@ export const Route = createFileRoute("/examples")({
 });
 
 type RiskLevel = "Critic" | "Ridicat" | "Moderat to Ridicat" | "Moderat";
-type Tag = "ICU" | "Emergency" | "Surgery" | "Pediatrie" | "Oncologie" | "Weekend Staffing" | "Ridicat Risk" | "Moderat Risk";
+type Tag = "ICU" | "Urgente" | "Chirurgie" | "Pediatrie" | "Oncologie" | "Personal weekend" | "Ridicat Risk" | "Moderat Risk";
 
 type Scenario = {
   id: string;
@@ -41,7 +41,7 @@ type Scenario = {
 const SCENARIOS: Scenario[] = [
   {
     id: "icu-night",
-    name: "ICU Night Shift Overload",
+    name: "Supraincarcare tura de noapte ATI",
     department: "Unitate Terapie Intensiva",
     icon: HeartPulse,
     risk: "Critic",
@@ -63,7 +63,7 @@ const SCENARIOS: Scenario[] = [
     drivers: ["Patient volume", "Incidents", "Overtime"],
     action: "Open surge staffing protocol and redistribute senior staff.",
     spark: [52, 55, 58, 62, 60, 65, 70, 72, 74, 73, 75, 76, 77, 78],
-    tags: ["Emergency", "Ridicat Risk"],
+    tags: ["Urgente", "Ridicat Risk"],
   },
   {
     id: "sur-short",
@@ -73,10 +73,10 @@ const SCENARIOS: Scenario[] = [
     risk: "Ridicat",
     riskScore: 72,
     description: "Reduced staff availability and higher post-operative monitoring needs increase fatigue risk.",
-    drivers: ["Staff shortage", "Patient-to-staff ratio", "Sick leave"],
+    drivers: ["Deficit personal", "Raport pacienti/personal", "Concedii medicale"],
     action: "Add floating staff and rebalance weekend shifts.",
     spark: [40, 44, 46, 48, 52, 55, 58, 60, 63, 65, 67, 68, 70, 72],
-    tags: ["Surgery", "Ridicat Risk"],
+    tags: ["Chirurgie", "Ridicat Risk"],
   },
   {
     id: "ped-seasonal",
@@ -112,14 +112,14 @@ const SCENARIOS: Scenario[] = [
     risk: "Ridicat",
     riskScore: 74,
     description: "Weekend coverage gaps create workload concentration among available staff.",
-    drivers: ["Coverage gap", "Overtime", "Staff absence"],
+    drivers: ["Gol de acoperire", "Overtime", "Absenta personal"],
     action: "Add weekend reserve staff and reduce double shifts.",
     spark: [38, 42, 46, 50, 54, 58, 62, 65, 67, 68, 70, 71, 73, 74],
-    tags: ["Weekend Staffing", "Ridicat Risk"],
+    tags: ["Personal weekend", "Ridicat Risk"],
   },
 ];
 
-const FILTERS: Tag[] = ["ICU", "Emergency", "Surgery", "Pediatrie", "Oncologie", "Weekend Staffing", "Ridicat Risk", "Moderat Risk"];
+const FILTERS: Tag[] = ["ICU", "Urgente", "Chirurgie", "Pediatrie", "Oncologie", "Personal weekend", "Ridicat Risk", "Moderat Risk"];
 
 function riskTone(risk: RiskLevel): "danger" | "warning" {
   return risk === "Critic" || risk === "Ridicat" ? "danger" : "warning";
@@ -157,7 +157,7 @@ function ExamplesPage() {
         id: s.id, name: s.name, department: s.department, riskScore: s.riskScore, ts: Date.now(),
       }));
     } catch { /* ignore */ }
-    toast.success("Scenario loaded into forecasting workspace", {
+    toast.success("Scenariul a fost incarcat in spatiul de prognoza", {
       description: `${s.name} — ${s.department}`,
     });
     setTimeout(() => {
@@ -183,10 +183,10 @@ function ExamplesPage() {
           <Library className="h-3 w-3" /> Exemple Pregenerate
         </div>
         <h1 className="mt-2 text-2xl lg:text-3xl font-semibold leading-tight">
-          Pregenerated Burnout Risk Scenarios
+          Scenarii pregenerate de risc de epuizare
         </h1>
         <p className="mt-1.5 text-sm text-muted-foreground max-w-2xl">
-          Explore realistic healthcare workforce pressure scenarios and generate AI-powered intervention plans.
+          Exploreaza scenarii realiste de presiune pe personalul medical si genereaza planuri de interventie asistate de AI.
         </p>
       </header>
 
@@ -334,7 +334,7 @@ function ScenarioCard({ s, index, loading, onLoad, onPreview }: {
             onClick={onPreview}
             className="btn-glow inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-secondary/40 px-2.5 py-1.5 text-xs hover:bg-secondary/70 transition"
           >
-            <Eye className="h-3 w-3" /> Preview Report
+            <Eye className="h-3 w-3" /> Previzualizare raport
           </button>
           <button
             onClick={onLoad}
@@ -344,7 +344,7 @@ function ScenarioCard({ s, index, loading, onLoad, onPreview }: {
             {loading
               ? <span className="h-3 w-3 rounded-full border-2 border-background/60 border-t-transparent animate-spin" />
               : <Play className="h-3 w-3 fill-current" />}
-            {loading ? "Loading…" : "Load Scenario"}
+            {loading ? "Loading…" : "Incarca scenariul"}
           </button>
         </div>
       </div>
@@ -398,4 +398,5 @@ function MiniChart({ data, tone }: { data: number[]; tone: "danger" | "warning" 
     </svg>
   );
 }
+
 

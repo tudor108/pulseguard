@@ -23,11 +23,11 @@ type AlertCard = {
 const CRITICAL_ALERTS: AlertCard[] = [
   { id: "c-1", severity: "critical", title: "ICU night shift risk increased by 18%",          detail: "Trailing 7-day burnout index breached the critical band on the night rotation.", unit: "Unitate Terapie Intensiva", driver: "Night-shift clustering", time: "12 min ago" },
   { id: "c-2", severity: "critical", title: "Departament Urgente overtime exceeded threshold", detail: "Average overtime 11.4h / staff / week vs 8h safe target — 5 nurses above soft cap.", unit: "Departament Urgente", driver: "Overtime load", time: "38 min ago" },
-  { id: "c-3", severity: "critical", title: "Sectie Chirurgie has 3 consecutive understaffed shifts", detail: "Nurse-to-patient ratio drifted to 1:7 on the last 3 night rotations.",          unit: "Sectie Chirurgie", driver: "Patient-to-staff ratio", time: "1 h ago" },
+  { id: "c-3", severity: "critical", title: "Sectie Chirurgie has 3 consecutive understaffed shifts", detail: "Nurse-to-patient ratio drifted to 1:7 on the last 3 night rotations.",          unit: "Sectie Chirurgie", driver: "Raport pacienti/personal", time: "1 h ago" },
 ];
 
 const WATCHLIST_ALERTS: AlertCard[] = [
-  { id: "w-1", severity: "warning", title: "Pediatrie seasonal pressure trending upward",       detail: "Forecast model predicts +22% admissions over the next 14 days.",                  unit: "Pediatrie",  driver: "Seasonal admissions", time: "2 h ago" },
+  { id: "w-1", severity: "warning", title: "Presiunea sezoniera in Pediatrie este in crestere",       detail: "Modelul estimeaza +22% internari in urmatoarele 14 zile.",                  unit: "Pediatrie",  driver: "Internari sezoniere", time: "2 h ago" },
   { id: "w-2", severity: "warning", title: "Oncologie recovery time below recommended buffer",    detail: "Average inter-shift recovery dropped to 9.2h vs 11h target.",                     unit: "Oncologie",    driver: "Recovery buffer",     time: "3 h ago" },
   { id: "w-3", severity: "warning", title: "Weekend staffing reserve below target",              detail: "Float-pool coverage at 62% vs 80% policy target for Sat–Sun.",                  unit: "Multi-sectie",  driver: "Reserve coverage",    time: "5 h ago" },
 ];
@@ -35,15 +35,15 @@ const WATCHLIST_ALERTS: AlertCard[] = [
 const RECOMMENDED_ACTIONS = [
   { id: "ra-1", icon: UserPlus,    title: "Add temporary night-shift coverage",                  detail: "Pull 2 nurses from float pool into ICU night rotation for 7 days." },
   { id: "ra-2", icon: TimerReset,  title: "Reduce overtime for high-exposure staff",             detail: "Cap weekly overtime at 8h for ER nurses currently above the soft cap." },
-  { id: "ra-3", icon: Users,       title: "Redistribute senior staff across high-pressure shifts", detail: "Re-balance senior coverage across ICU, ER and Surgical night windows." },
-  { id: "ra-4", icon: RefreshCw,   title: "Review risk again in 72 hours",                       detail: "Schedule an automated re-forecast and stand-up review in 72h." },
+  { id: "ra-3", icon: Users,       title: "Redistribuie personalul senior pe turele cu presiune mare", detail: "Reechilibreaza acoperirea seniorilor in ferestrele de noapte ATI, UPU si Chirurgie." },
+  { id: "ra-4", icon: RefreshCw,   title: "Reevalueaza riscul peste 72 de ore",                       detail: "Programeaza o reprognoza automata si o revizuire operativa in 72h." },
 ];
 
 const SCENARIOS = [
   { metric: "Avg. burnout risk (14d)", current: "78%", recommended: "54%", delta: "-24 pts" },
   { metric: "Night-shift coverage", current: "82%", recommended: "96%", delta: "+14 pts" },
-  { metric: "Overtime hours / staff / wk", current: "11.4h", recommended: "7.2h", delta: "-4.2h" },
-  { metric: "Fatigue index", current: "0.71", recommended: "0.48", delta: "-0.23" },
+  { metric: "Ore suplimentare (h)ours / staff / wk", current: "11.4h", recommended: "7.2h", delta: "-4.2h" },
+  { metric: "Oboseala index", current: "0.71", recommended: "0.48", delta: "-0.23" },
   { metric: "Interventie urgency", current: "Ridicat", recommended: "Moderat", delta: "↓ tier" },
 ];
 
@@ -435,7 +435,7 @@ function AlertCardView({
 
       <div className="mt-3 flex items-center gap-2">
         <button
-          onClick={() => toast.success("Deschidere prognoza", { description: `${alert.unit} · 14-day view` })}
+          onClick={() => toast.success("Deschidere prognoza", { description: `${alert.unit} · vizualizare 14 zile` })}
           className="inline-flex items-center gap-1 rounded-md border border-border/60 bg-background/40 px-2 py-1 text-[10.5px] font-medium hover:bg-[var(--cyan-glow)]/10 hover:border-[var(--cyan-glow)]/50 transition"
         >
           <LineChart className="h-3 w-3" /> Vezi Prognoza
@@ -450,6 +450,7 @@ function AlertCardView({
     </article>
   );
 }
+
 
 
 

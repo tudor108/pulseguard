@@ -8,7 +8,7 @@ export const Route = createFileRoute("/staff-load")({
   head: () => ({
     meta: [
       { title: "Incarcare Personal — PulseGuard AI" },
-      { name: "description", content: "Workload pressure and occupancy across every hospital department." },
+      { name: "description", content: "Presiune de lucru and occupancy across every hospital department." },
       { property: "og:title", content: "Incarcare Personal — PulseGuard AI" },
       { property: "og:description", content: "Department-level staffing load and occupancy." },
     ],
@@ -21,7 +21,7 @@ function StaffLoadPage() {
     <AppShell>
       <header className="mb-6 animate-fade-up">
         <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground inline-flex items-center gap-2"><Users className="h-3 w-3" /> Incarcare Personal</div>
-        <h1 className="mt-2 text-2xl lg:text-3xl font-semibold">Department workload</h1>
+        <h1 className="mt-2 text-2xl lg:text-3xl font-semibold">Incarcare departamente</h1>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -44,9 +44,9 @@ function StaffLoadPage() {
                 )}>{band.label}</span>
               </div>
               <div className="mt-4 grid grid-cols-2 gap-3">
-                <Stat label="Burnout" value={d.burnoutRisk} />
-                <Stat label="Fatigue" value={d.fatigueIndex} />
-                <Stat label="Workload" value={d.workloadPressure} />
+                <Stat label="Epuizare" value={d.burnoutRisk} />
+                <Stat label="Oboseala" value={d.fatigueIndex} />
+                <Stat label="Volum de lucru" value={d.workloadPressure} />
                 <Stat label="Deficit" value={d.shortageRisk} />
               </div>
               <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
@@ -78,4 +78,5 @@ function Stat({ label, value }: { label: string; value: number }) {
     </div>
   );
 }
+
 

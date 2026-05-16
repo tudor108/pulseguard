@@ -13,7 +13,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Prezentare — PulseGuard AI" },
-      { name: "description", content: "Operational health summary: live burnout risk, 14-day forecast, AI assistant and generated intervention report." },
+      { name: "description", content: "Sumar operational: risc live de epuizare, prognoza pe 14 zile, asistent AI si raport de interventie generat." },
       { property: "og:title", content: "Prezentare — PulseGuard AI" },
       { property: "og:description", content: "Hospital workforce intelligence command center." },
     ],
@@ -55,7 +55,7 @@ function Prezentare() {
       </header>
 
       <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-        <KpiCard label="Current Burnout Risk" value={k.current} unit="/ 100" delta={k.cDelta} trend={k.cDelta >= 0 ? "up" : "down"} tone={tone(k.current)} highRisk={k.current >= 70} icon={Flame}
+        <KpiCard label="Current Risc epuizare" value={k.current} unit="/ 100" delta={k.cDelta} trend={k.cDelta >= 0 ? "up" : "down"} tone={tone(k.current)} highRisk={k.current >= 70} icon={Flame}
           spark={series.map((s) => s.stressScore * 10)} />
         <KpiCard label="Risc estimat 14 zile" value={k.predicted} unit="/ 100" delta={k.pDelta} trend={k.pDelta >= 0 ? "up" : "down"} tone={tone(k.predicted)} highRisk={k.predicted >= 70} icon={HeartPulse}
           spark={series.map((s) => s.workload)} />
@@ -74,4 +74,5 @@ function Prezentare() {
     </AppShell>
   );
 }
+
 

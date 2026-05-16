@@ -25,7 +25,7 @@ export type ScenarioAlert = {
   timestamp: string;
 };
 
-export type GeneratedScenario = {
+export type GeneratScenario = {
   id: string;
   name: string;
   department: string;
@@ -49,9 +49,9 @@ export type GeneratedScenario = {
 };
 
 type Ctx = {
-  active: GeneratedScenario | null;
-  setActive: (s: GeneratedScenario | null) => void;
-  generateFromPrompt: (prompt: string) => GeneratedScenario;
+  active: GeneratScenario | null;
+  setActive: (s: GeneratScenario | null) => void;
+  generateFromPrompt: (prompt: string) => GeneratScenario;
 };
 
 const ScenarioCtx = createContext<Ctx | null>(null);
@@ -66,8 +66,8 @@ function detectContext(prompt: string) {
     /surg/.test(p) ? "Sectie Chirurgie · Tower A" :
     /oncolog/.test(p) ? "Oncologie · Tower A L4" :
     /pediatr/.test(p) ? "Pediatrie · Tower C" :
-    /maternity/.test(p) ? "Maternity · Tower C L1" :
-    /psych/.test(p) ? "Psychiatry · Tower D L2" :
+    /maternity/.test(p) ? "Maternitate · Tower C L1" :
+    /psych/.test(p) ? "Psihiatrie · Tower D L2" :
     "Multi-Department · Hospital-wide";
 
   const nightShift = /night\s*shift|overnight|nocturn/.test(p);
@@ -98,7 +98,7 @@ function detectContext(prompt: string) {
   return { dept, riskScore: base, riskLevel, nightShift, overtime, shortage, surge, weekend, emotional };
 }
 
-export function generateScenario(prompt: string): GeneratedScenario {
+export function generateScenario(prompt: string): GeneratScenario {
   const ctx = detectContext(prompt);
   const horizon = 14;
   const id = `gen-${Date.now()}`;
@@ -123,8 +123,8 @@ export function generateScenario(prompt: string): GeneratedScenario {
     const pred = Math.min(98, Math.max(10, Math.round(ctx.riskScore + trend - 10 + Math.sin(i / 2) * 3)));
     return {
       ...p,
-      predictedBurnoutRisk: pred,
-      predictedFatigueIndex: Math.min(98, pred - 4),
+      predictedEpuizareRisk: pred,
+      predictedObosealaIndex: Math.min(98, pred - 4),
       predictedStaffDeficitRisk: Math.min(95, Math.round(pred * 0.85)),
       confidenceLow: Math.max(5, pred - 8),
       confidenceRidicat: Math.min(99, pred + 7),
@@ -134,9 +134,9 @@ export function generateScenario(prompt: string): GeneratedScenario {
   const drivers: RiskDriver[] = [];
   if (ctx.overtime) drivers.push({ driverName: "Sustained overtime exposure", severity: "high", explanation: "Average overtime per nurse climbed to 13.4h/week, +28% versus 30-day baseline.", recommendedMitigation: "Cap individual overtime at 8h/week and rotate float-pool staff." });
   if (ctx.nightShift) drivers.push({ driverName: "Consecutive night-shift density", severity: "critical", explanation: "Six clinicians completed ≥4 consecutive night shifts within the last 10 days.", recommendedMitigation: "Insert 36h recovery buffer after 3 consecutive nights." });
-  if (ctx.shortage) drivers.push({ driverName: "Patient-to-staff ratio drift", severity: "high", explanation: "Ratio climbed from 4.4 to 5.6 during peak windows.", recommendedMitigation: "Reassign 2 nurses from float pool for next 7 days." });
+  if (ctx.shortage) drivers.push({ driverName: "Raport pacienti/personal drift", severity: "high", explanation: "Ratio climbed from 4.4 to 5.6 during peak windows.", recommendedMitigation: "Reassign 2 nurses from float pool for next 7 days." });
   if (ctx.surge) drivers.push({ driverName: "Patient volume surge", severity: "high", explanation: "Walk-in admissions exceeded weekly forecast by +34%.", recommendedMitigation: "Activate surge protocol and expand triage capacity 22:00–04:00." });
-  if (ctx.emotional) drivers.push({ driverName: "Emotional workload escalation", severity: "medium", explanation: "Stress survey score rose +0.9 points; 4 staff flagged for wellbeing check.", recommendedMitigation: "Schedule 30-min wellbeing check-ins and counselling support." });
+  if (ctx.emotional) drivers.push({ driverName: "Emotional workload escalation", severity: "medium", explanation: "Scor sondaj stres rose +0.9 points; 4 staff flagged for wellbeing check.", recommendedMitigation: "Schedule 30-min wellbeing check-ins and counselling support." });
   if (ctx.weekend) drivers.push({ driverName: "Weekend coverage gap", severity: "medium", explanation: "Baseline weekend coverage intersects with elective backlog.", recommendedMitigation: "Activate weekend float pool; defer 2 elective cases to Monday." });
   if (drivers.length === 0) drivers.push({ driverName: "Compounding workload pressure", severity: "medium", explanation: "Multiple operational indicators trending upward simultaneously.", recommendedMitigation: "Run targeted scenario simulation in the simulator." });
 
@@ -149,9 +149,9 @@ export function generateScenario(prompt: string): GeneratedScenario {
   ].filter(Boolean) as ScenarioRecommendation[];
 
   const followUpIndicators = [
-    "Overtime hours per nurse (target ≤ 8h/week)",
-    "Patient-to-staff ratio (target ≤ 4.5)",
-    "Stress survey score (re-survey Day 7)",
+    "Ore suplimentare (h)ours per nurse (target ≤ 8h/week)",
+    "Raport pacienti/personal (target ≤ 4.5)",
+    "Scor sondaj stres (re-survey Day 7)",
     "Sick-leave events (rolling 7-day)",
     "Night-shift clustering per individual",
     "Incident report frequency",
@@ -160,24 +160,24 @@ export function generateScenario(prompt: string): GeneratedScenario {
 
   const verbs = ctx.riskScore >= 70 ? "is escalating sharply" : ctx.riskScore >= 50 ? "is trending upward" : "remains within manageable range";
   const explanation =
-    `Over the last 14 days, ${ctx.dept} ${verbs}. ` +
+    `Over the last 14 zile, ${ctx.dept} ${verbs}. ` +
     `Operational signals show ${ctx.overtime ? "a +28% overtime spike" : "stable overtime"}, ` +
     `${ctx.shortage ? "patient-to-staff ratio drift to 5.6" : "patient ratio within target band"}, ` +
     `and ${ctx.emotional ? "rising stress survey scores (+0.9)" : "steady stress survey scores"}. ` +
     `Historical analogues suggest a ${ctx.riskScore >= 70 ? "9–11" : "14–18"} day window before incident clustering if no intervention is deployed. ` +
-    `Predictive burnout risk reaches ${forecastSeries[forecastSeries.length - 1].predictedBurnoutRisk} by day ${horizon}.`;
+    `Predictive burnout risk reaches ${forecastSeries[forecastSeries.length - 1].predictedEpuizareRisk} by day ${horizon}.`;
 
   const expectedImpact = ctx.riskScore >= 70
-    ? "Without intervention, predicted incident rate increases by ~18% and absenteeism by ~12% within 14 days."
-    : "Without intervention, fatigue index drifts up by ~6 points within 14 days; impact remains contained.";
+    ? "Without intervention, predicted incident rate increases by ~18% and absenteeism by ~12% within 14 zile."
+    : "Without intervention, fatigue index drifts up by ~6 points within 14 zile; impact remains contained.";
 
   const scenarioName =
     ctx.nightShift && ctx.overtime ? "Night Shift Overload & Overtime Spike" :
     ctx.surge ? "Patient Volume Surge Scenario" :
     ctx.shortage ? "Staff Deficit Pressure Scenario" :
     ctx.weekend ? "Weekend Understaffing Scenario" :
-    ctx.emotional ? "Emotional Workload Escalation" :
-    "Generated Burnout Risk Scenario";
+    ctx.emotional ? "Emotional Volum de lucru Escalation" :
+    "Generat Risc epuizare Scenario";
 
   const alerts: ScenarioAlert[] = [
     { title: `${ctx.dept.split(" · ")[0]} risk increased significantly`, severity: ctx.riskScore >= 75 ? "critical" : "warning", department: ctx.dept, primaryDriver: drivers[0].driverName, timestamp: now.toISOString() },
@@ -191,7 +191,7 @@ export function generateScenario(prompt: string): GeneratedScenario {
     forecastHorizon: horizon,
     riskLevel: ctx.riskLevel,
     riskScore: ctx.riskScore,
-    predicted14d: forecastSeries[forecastSeries.length - 1].predictedBurnoutRisk,
+    predicted14d: forecastSeries[forecastSeries.length - 1].predictedEpuizareRisk,
     staffPressure: Math.min(98, ctx.riskScore + 4),
     interventionUrgency: Math.min(99, ctx.riskScore - 2),
     confidenceScore: confidence,
@@ -208,7 +208,7 @@ export function generateScenario(prompt: string): GeneratedScenario {
 }
 
 export function ActiveScenarioProvider({ children }: { children: ReactNode }) {
-  const [active, setActive] = useState<GeneratedScenario | null>(null);
+  const [active, setActive] = useState<GeneratScenario | null>(null);
   const generateFromPrompt = useCallback((prompt: string) => generateScenario(prompt), []);
   return (
     <ScenarioCtx.Provider value={{ active, setActive, generateFromPrompt }}>
@@ -222,5 +222,6 @@ export function useActiveScenario() {
   if (!ctx) throw new Error("useActiveScenario must be used inside ActiveScenarioProvider");
   return ctx;
 }
+
 
 

@@ -56,10 +56,10 @@ export const departments: Department[] = [
   { id: "er",  name: "Departament Urgente", unit: "ER · Ground floor", staff: 112, burnoutRisk: 71, fatigueIndex: 68, workloadPressure: 88, shortageRisk: 58, occupancy: 97, trend: "up", delta: 4.1, lead: "Dr. Okafor" },
   { id: "onc", name: "Oncologie", unit: "Tower A · L4", staff: 56, burnoutRisk: 62, fatigueIndex: 59, workloadPressure: 64, shortageRisk: 41, occupancy: 81, trend: "stable", delta: 0.6, lead: "Dr. Lindqvist" },
   { id: "ped", name: "Pediatrie", unit: "Tower C · L2", staff: 64, burnoutRisk: 44, fatigueIndex: 41, workloadPressure: 48, shortageRisk: 30, occupancy: 72, trend: "down", delta: -2.8, lead: "Dr. Haddad" },
-  { id: "sur", name: "Surgery", unit: "Tower A · L3", staff: 78, burnoutRisk: 58, fatigueIndex: 55, workloadPressure: 72, shortageRisk: 47, occupancy: 86, trend: "up", delta: 3.2, lead: "Dr. Brennan" },
-  { id: "mat", name: "Maternity", unit: "Tower C · L1", staff: 48, burnoutRisk: 39, fatigueIndex: 36, workloadPressure: 44, shortageRisk: 22, occupancy: 68, trend: "down", delta: -1.4, lead: "Dr. Kovač" },
-  { id: "rad", name: "Radiology", unit: "Tower B · L1", staff: 32, burnoutRisk: 51, fatigueIndex: 47, workloadPressure: 58, shortageRisk: 34, occupancy: 74, trend: "stable", delta: 0.9, lead: "Dr. Park" },
-  { id: "psy", name: "Psychiatry", unit: "Tower D · L2", staff: 38, burnoutRisk: 66, fatigueIndex: 61, workloadPressure: 60, shortageRisk: 52, occupancy: 79, trend: "up", delta: 5.0, lead: "Dr. Almeida" },
+  { id: "sur", name: "Chirurgie", unit: "Tower A · L3", staff: 78, burnoutRisk: 58, fatigueIndex: 55, workloadPressure: 72, shortageRisk: 47, occupancy: 86, trend: "up", delta: 3.2, lead: "Dr. Brennan" },
+  { id: "mat", name: "Maternitate", unit: "Tower C · L1", staff: 48, burnoutRisk: 39, fatigueIndex: 36, workloadPressure: 44, shortageRisk: 22, occupancy: 68, trend: "down", delta: -1.4, lead: "Dr. Kovač" },
+  { id: "rad", name: "Radiologie", unit: "Tower B · L1", staff: 32, burnoutRisk: 51, fatigueIndex: 47, workloadPressure: 58, shortageRisk: 34, occupancy: 74, trend: "stable", delta: 0.9, lead: "Dr. Park" },
+  { id: "psy", name: "Psihiatrie", unit: "Tower D · L2", staff: 38, burnoutRisk: 66, fatigueIndex: 61, workloadPressure: 60, shortageRisk: 52, occupancy: 79, trend: "up", delta: 5.0, lead: "Dr. Almeida" },
 ];
 
 export type SeriesPoint = {
@@ -144,10 +144,10 @@ export type Recommendation = {
 
 export const recommendations: Recommendation[] = [
   { id: "r1", title: "Add 2 nurses to ICU night shift for next 7 days", detail: "Forecast shows fatigue index crossing 75 by Day 4. Reinforce night rotation to relieve tenure staff.", impact: "high", eta: "Tura urmatoare", department: "ICU" },
-  { id: "r2", title: "Cap ER overtime at 8h / week", detail: "Sustained overtime above 12h correlates with +18% incident risk in the last 14 days.", impact: "high", eta: "This week", department: "ER" },
-  { id: "r3", title: "Schedule wellbeing check-ins for Oncologie team", detail: "Stress survey scores rose by 0.9 points; recommend 30-min individual sessions.", impact: "medium", eta: "Within 5 days", department: "Oncologie" },
-  { id: "r4", title: "Redistribute 4 patients from Surgery to Maternity float pool", detail: "Maternity occupancy at 68% — capacity exists to offload pressure from Surgery.", impact: "medium", eta: "48 hours", department: "Surgery" },
-  { id: "r5", title: "Trigger fatigue micro-break protocol in Psychiatry", detail: "Predicted fatigue index reaches 72 within 6 days. Activate 15-min protected breaks.", impact: "low", eta: "Next 72h", department: "Psychiatry" },
+  { id: "r2", title: "Cap ER overtime at 8h / week", detail: "Sustained overtime above 12h correlates with +18% incident risk in the last 14 zile.", impact: "high", eta: "This week", department: "ER" },
+  { id: "r3", title: "Schedule wellbeing check-ins for Oncologie team", detail: "Scor sondaj stress rose by 0.9 points; recommend 30-min individual sessions.", impact: "medium", eta: "Within 5 days", department: "Oncologie" },
+  { id: "r4", title: "Redistribute 4 patients from Chirurgie to Maternitate float pool", detail: "Maternitate occupancy at 68% — capacity exists to offload pressure from Chirurgie.", impact: "medium", eta: "48 hours", department: "Chirurgie" },
+  { id: "r5", title: "Trigger fatigue micro-break protocol in Psihiatrie", detail: "Predicted fatigue index reaches 72 within 6 days. Activate 15-min protected breaks.", impact: "low", eta: "Next 72h", department: "Psihiatrie" },
 ];
 
 export type IncidentSignal = {
@@ -163,7 +163,7 @@ export const liveSignals: IncidentSignal[] = [
   { id: "s2", time: "11 min ago", message: "ER patient-to-staff ratio at 5.8 (target 4.5)", level: "warn", dept: "ER" },
   { id: "s3", time: "26 min ago", message: "Oncologie stress survey submitted (n=18)", level: "info", dept: "Oncologie" },
   { id: "s4", time: "48 min ago", message: "Pediatrie fatigue index dropping (-3.1)", level: "info", dept: "Pediatrie" },
-  { id: "s5", time: "1h ago", message: "Psychiatry sick-leave +2 vs 7-day baseline", level: "warn", dept: "Psychiatry" },
+  { id: "s5", time: "1h ago", message: "Psihiatrie sick-leave +2 vs 7-day baseline", level: "warn", dept: "Psihiatrie" },
 ];
 
 export function riskBand(score: number): { label: string; tone: "success" | "warning" | "danger" | "muted" } {
@@ -184,20 +184,20 @@ export type Scenario = {
 };
 
 export const scenarios: Scenario[] = [
-  { id: "icu-night", name: "ICU Night Shift Overload", department: "Intensive Care · Tower B",
+  { id: "icu-night", name: "Supraincarcare tura de noapte ATI", department: "Intensive Care · Tower B",
     risk: 82, description: "Sustained overtime and elevated patient-to-nurse ratio across 14 consecutive nights.",
     spark: [42, 48, 51, 55, 60, 64, 68, 71, 73, 76, 79, 82] },
   { id: "er-surge", name: "Departament Urgente Surge", department: "ER · Ground floor",
     risk: 76, description: "Walk-in volume +34% during weekend; triage bottleneck between 22:00–04:00.",
     spark: [52, 55, 58, 62, 60, 65, 70, 72, 74, 73, 75, 76] },
-  { id: "sur-short", name: "Sectie Chirurgie Staff Deficit", department: "Surgery · Tower A",
+  { id: "sur-short", name: "Sectie Chirurgie Staff Deficit", department: "Chirurgie · Tower A",
     risk: 68, description: "3 scheduled OR teams understaffed by 1 scrub nurse each for 6 days.",
     spark: [40, 44, 46, 48, 52, 55, 58, 60, 63, 65, 67, 68] },
   { id: "ped-seasonal", name: "Pediatric Unit Seasonal Pressure", department: "Pediatrie · Tower C",
     risk: 54, description: "RSV admissions trending up; predicted +20% beds in the next 10 days.",
     spark: [30, 33, 36, 40, 42, 44, 47, 49, 50, 52, 53, 54] },
   { id: "onc-load", name: "Oncologie Department Emotional Load", department: "Oncologie · Tower A L4",
-    risk: 62, description: "Stress survey scores rose +0.9 points; 4 staff flagged for wellbeing check.",
+    risk: 62, description: "Scor sondaj stress rose +0.9 points; 4 staff flagged for wellbeing check.",
     spark: [44, 46, 48, 50, 51, 53, 55, 57, 58, 60, 61, 62] },
   { id: "weekend", name: "Weekend Understaffing Scenario", department: "All wards · Sat–Sun",
     risk: 71, description: "Routine weekend coverage gap intersects with elective surgery backlog.",
@@ -215,10 +215,11 @@ export type AlertItem = {
 
 export const alerts: AlertItem[] = [
   { id: "a1", title: "ICU burnout risk crossing critical threshold", detail: "Forecast hits 80 within 6 days at current trajectory.", department: "ICU · Tower B", level: "critical", time: "2 min ago" },
-  { id: "a2", title: "ER overtime exceeding 14h/nurse this week", detail: "5 nurses above the 12h soft cap.", department: "Emergency", level: "critical", time: "18 min ago" },
+  { id: "a2", title: "ER overtime exceeding 14h/nurse this week", detail: "5 nurses above the 12h soft cap.", department: "Urgente", level: "critical", time: "18 min ago" },
   { id: "a3", title: "Oncologie stress survey complete", detail: "18 responses · average score 6.7 (+0.9 vs baseline).", department: "Oncologie", level: "info", time: "1h ago" },
-  { id: "a4", title: "Psychiatry sick-leave anomaly", detail: "+2 cases vs 7-day baseline; monitor for fatigue spillover.", department: "Psychiatry", level: "warning", time: "2h ago" },
-  { id: "a5", title: "Maternity capacity available", detail: "Occupancy at 68%; eligible to absorb 4 transfers.", department: "Maternity", level: "info", time: "3h ago" },
-  { id: "a6", title: "Surgery overtime trending up", detail: "+3.2% vs last week; recommend monitoring.", department: "Surgery", level: "warning", time: "5h ago" },
+  { id: "a4", title: "Psihiatrie sick-leave anomaly", detail: "+2 cases vs 7-day baseline; monitor for fatigue spillover.", department: "Psihiatrie", level: "warning", time: "2h ago" },
+  { id: "a5", title: "Maternitate capacity available", detail: "Occupancy at 68%; eligible to absorb 4 transfers.", department: "Maternitate", level: "info", time: "3h ago" },
+  { id: "a6", title: "Chirurgie overtime trending up", detail: "+3.2% vs last week; recommend monitoring.", department: "Chirurgie", level: "warning", time: "5h ago" },
 ];
+
 

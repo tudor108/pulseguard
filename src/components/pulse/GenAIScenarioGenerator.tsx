@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+﻿import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import {
   Sparkles, Wand2, Loader2, CheckCircle2, Eraser, Lightbulb, FlaskConical,
@@ -6,32 +6,32 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { useActiveScenario, type GeneratedScenario } from "@/lib/pulse/scenario-context";
+import { useActiveScenario, type GeneratScenario } from "@/lib/pulse/scenario-context";
 
 const CHIPS = [
   "ICU overload",
   "ED surge",
   "Weekend understaffing",
   "Night shift fatigue",
-  "Staff shortage",
+  "Deficit personal",
   "Ridicat patient volume",
 ];
 
 const EXAMPLE_PROMPTS = [
   "Generate a scenario for ICU night shift overload next week with overtime escalation.",
   "Create a high-risk emergency department surge for the weekend with triage bottleneck.",
-  "Simulate burnout risk for surgical ward staff shortage over 14 days.",
+  "Simulate burnout risk for surgical ward staff shortage over 14 zile.",
   "Generate a moderate-risk oncology emotional workload scenario.",
   "Create a weekend understaffing scenario with increased overtime in pediatrics.",
 ];
 
 const GEN_STEPS = [
-  "Interpreting operational context…",
-  "Generating historical time-series…",
-  "Forecasting burnout risk…",
-  "Detecting key risk drivers…",
-  "Creating intervention recommendations…",
-  "Updating dashboard panels…",
+  "Interpreting operational contextâ€¦",
+  "Generating historical time-seriesâ€¦",
+  "Forecasting burnout riskâ€¦",
+  "Detecting key risk driversâ€¦",
+  "Creating intervention recommendationsâ€¦",
+  "Updating dashboard panelsâ€¦",
 ];
 
 export function GenAIScenarioGenerator() {
@@ -39,7 +39,7 @@ export function GenAIScenarioGenerator() {
   const [input, setInput] = useState("");
   const [generating, setGenerating] = useState(false);
   const [step, setStep] = useState(0);
-  const [pending, setPending] = useState<GeneratedScenario | null>(null);
+  const [pending, setPending] = useState<GeneratScenario | null>(null);
   const taRef = useRef<HTMLTextAreaElement>(null);
   const navigate = useNavigate();
 
@@ -64,10 +64,10 @@ export function GenAIScenarioGenerator() {
     }, GEN_STEPS.length * 320 + 250);
   };
 
-  const apply = (scenario: GeneratedScenario) => {
+  const apply = (scenario: GeneratScenario) => {
     setActive(scenario);
     toast.success("Panou updated with active scenario", {
-      description: `${scenario.name} · ${scenario.department}`,
+      description: `${scenario.name} Â· ${scenario.department}`,
     });
   };
 
@@ -96,7 +96,7 @@ export function GenAIScenarioGenerator() {
           <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-success ring-2 ring-background animate-pulse-soft" />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">PulseGuard GenAI · Engine v2.4</div>
+          <div className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">PulseGuard GenAI Â· Engine v2.4</div>
           <h2 className="mt-0.5 text-base font-semibold leading-tight">Generator Scenarii GenAI</h2>
           <p className="mt-0.5 text-xs text-muted-foreground">
             Describe a medical workforce situation and generate realistic burnout risk data, forecasts, and intervention recommendations.
@@ -112,7 +112,7 @@ export function GenAIScenarioGenerator() {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") start(input); }}
           rows={4}
-          placeholder="Describe the staffing pressure, department, workload pattern, and forecast horizon…"
+          placeholder="Describe the staffing pressure, department, workload pattern, and forecast horizonâ€¦"
           className="w-full resize-none bg-transparent px-4 py-3.5 text-sm leading-relaxed placeholder:text-muted-foreground/70 focus:outline-none"
           aria-label="Scenario prompt"
         />
@@ -121,7 +121,7 @@ export function GenAIScenarioGenerator() {
             <button
               key={c}
               type="button"
-              onClick={() => setInput((v) => (v ? `${v.replace(/\s+$/, "")} · ${c}` : c))}
+              onClick={() => setInput((v) => (v ? `${v.replace(/\s+$/, "")} Â· ${c}` : c))}
               className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-secondary/40 px-2 py-0.5 text-[10.5px] text-muted-foreground hover:text-foreground hover:border-[var(--cyan-glow)]/60 hover:bg-secondary/70 transition"
             >
               <Sparkles className="h-2.5 w-2.5 text-[var(--cyan-glow)]" /> {c}
@@ -138,7 +138,7 @@ export function GenAIScenarioGenerator() {
           className="btn-glow inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[var(--cyan-glow)] to-[var(--indigo-glow)] px-4 py-2 text-xs font-semibold text-background ring-glow disabled:opacity-70"
         >
           {generating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Wand2 className="h-3.5 w-3.5" />}
-          {generating ? "Generating…" : "Generate Scenario"}
+          {generating ? "Generatingâ€¦" : "Generate Scenario"}
         </button>
         <button onClick={useExample} className="inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-secondary/40 px-3 py-2 text-xs hover:bg-secondary/70 transition">
           <Lightbulb className="h-3.5 w-3.5 text-[var(--cyan-glow)]" /> Use Example Prompt
@@ -147,8 +147,8 @@ export function GenAIScenarioGenerator() {
           <Eraser className="h-3.5 w-3.5" /> Clear
         </button>
         <span className="ml-auto text-[10px] text-muted-foreground hidden sm:inline-flex items-center gap-1">
-          <kbd className="rounded border border-border/60 bg-secondary/40 px-1 py-px font-mono text-[9px]">⌘</kbd>
-          <kbd className="rounded border border-border/60 bg-secondary/40 px-1 py-px font-mono text-[9px]">↵</kbd>
+          <kbd className="rounded border border-border/60 bg-secondary/40 px-1 py-px font-mono text-[9px]">âŒ˜</kbd>
+          <kbd className="rounded border border-border/60 bg-secondary/40 px-1 py-px font-mono text-[9px]">â†µ</kbd>
           to generate
         </span>
       </div>
@@ -200,7 +200,7 @@ export function GenAIScenarioGenerator() {
           <div className="flex-1 min-w-0">
             <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Active Scenario</div>
             <div className="text-sm font-medium truncate">{active.name}</div>
-            <div className="text-[11px] text-muted-foreground">{active.department} · risk {active.riskScore}/100 · confidence {active.confidenceScore}%</div>
+            <div className="text-[11px] text-muted-foreground">{active.department} Â· risk {active.riskScore}/100 Â· confidence {active.confidenceScore}%</div>
           </div>
           <button onClick={() => setActive(null)} className="text-[11px] text-muted-foreground hover:text-foreground transition">Clear</button>
         </div>
@@ -212,8 +212,8 @@ export function GenAIScenarioGenerator() {
 function ResultPanel({
   scenario, active, onAplica, onRegenerate, onReport,
 }: {
-  scenario: GeneratedScenario;
-  active: GeneratedScenario | null;
+  scenario: GeneratScenario;
+  active: GeneratScenario | null;
   onAplica: () => void;
   onRegenerate: () => void;
   onReport: () => void;
@@ -230,7 +230,7 @@ function ResultPanel({
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground inline-flex items-center gap-2">
-            <Sparkles className="h-3 w-3 text-[var(--cyan-glow)]" /> Generated scenario
+            <Sparkles className="h-3 w-3 text-[var(--cyan-glow)]" /> Generat scenario
             {isApplied && (
               <span className="inline-flex items-center gap-1 rounded-full border border-[var(--cyan-glow)]/40 bg-[var(--cyan-glow)]/10 px-1.5 py-0.5 text-[9px] text-[var(--cyan-glow)]">
                 <CheckCircle2 className="h-2.5 w-2.5" /> Applied
@@ -240,16 +240,16 @@ function ResultPanel({
           <h3 className="mt-1 text-lg font-semibold leading-tight">{scenario.name}</h3>
           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
             <span>{scenario.department}</span>
-            <span>·</span>
+            <span>Â·</span>
             <span>Orizont prognoza {scenario.forecastHorizon}d</span>
-            <span>·</span>
-            <span>Confidence {scenario.confidenceScore}%</span>
-            <span>·</span>
-            <span suppressHydrationWarning>Generated {new Date(scenario.generatedAt).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}</span>
+            <span>Â·</span>
+            <span>Incredere {scenario.confidenceScore}%</span>
+            <span>Â·</span>
+            <span suppressHydrationWarning>Generat {new Date(scenario.generatedAt).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}</span>
           </div>
         </div>
         <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium border self-start", riskTone)}>
-          <Activity className="h-3.5 w-3.5" /> {scenario.riskLevel} · {scenario.riskScore}/100
+          <Activity className="h-3.5 w-3.5" /> {scenario.riskLevel} Â· {scenario.riskScore}/100
         </span>
       </header>
 
@@ -351,4 +351,6 @@ function ResultPanel({
     </article>
   );
 }
+
+
 
