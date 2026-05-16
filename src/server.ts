@@ -7,6 +7,10 @@ type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
 };
 
+type RuntimeEnv = {
+  CORS_ORIGIN?: string;
+};
+
 let serverEntryPromise: Promise<ServerEntry> | undefined;
 
 async function getServerEntry(): Promise<ServerEntry> {
@@ -22,6 +26,27 @@ function brandedErrorResponse(): Response {
   return new Response(renderErrorPage(), {
     status: 500,
     headers: { "content-type": "text/html; charset=utf-8" },
+  });
+}
+
+function getCorsOrigin(env: unknown): string | null {
+  if (!env || typeof env !== "object") return null;
+  const value = (env as RuntimeEnv).CORS_ORIGIN;
+  if (!value || value.trim().length === 0) return null;
+  return value.trim();
+}
+
+function withCorsHeaders(response: Response, corsOrigin: string | null): Response {
+  if (!corsOrigin) return response;
+  const headers = new Headers(response.headers);
+  headers.set("Access-Control-Allow-Origin", corsOrigin);
+  headers.set("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+  headers.set("Access-Control-Allow-Headers", "Content-Type,Authorization");
+  headers.set("Vary", "Origin");
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
   });
 }
 
@@ -68,13 +93,32 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    const url = new URL(request.url);
+    const corsOrigin = getCorsOrigin(env);
+
+    if (url.pathname === "/health") {
+      return withCorsHeaders(
+        Response.json({
+          ok: true,
+          service: "pulseguard",
+          timestamp: new Date().toISOString(),
+        }),
+        corsOrigin,
+      );
+    }
+
+    if (request.method === "OPTIONS") {
+      return withCorsHeaders(new Response(null, { status: 204 }), corsOrigin);
+    }
+
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      const normalized = await normalizeCatastrophicSsrResponse(response);
+      return withCorsHeaders(normalized, corsOrigin);
     } catch (error) {
       console.error(error);
-      return brandedErrorResponse();
+      return withCorsHeaders(brandedErrorResponse(), corsOrigin);
     }
   },
 };
