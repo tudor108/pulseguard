@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: realtime-gateway
+  namespace: pulseguard
+  labels:
+    app: realtime-gateway
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: realtime-gateway
+  template:
+    metadata:
+      labels:
+        app: realtime-gateway
+    spec:
+      serviceAccountName: realtime-gateway
+      containers:
+        - name: realtime-gateway
+          image: us-central1-docker.pkg.dev/project-73d1e32a-8e68-4750-93c/pulseguard/realtime-gateway:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8090
+          env:
+            - name: GOOGLE_CLOUD_PROJECT
+              valueFrom:
+                configMapKeyRef:
+                  name: pulseguard-platform-config
+                  key: GOOGLE_CLOUD_PROJECT
+            - name: PUBSUB_SUBSCRIPTION
+              valueFrom:
+                configMapKeyRef:
+                  name: pulseguard-platform-config
+                  key: TELEMETRY_SUBSCRIPTION
+            - name: ML_INFERENCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: pulseguard-platform-config
+                  key: ML_INFERENCE_URL
+            - name: SHADOW_ML_INFERENCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: pulseguard-platform-config
+                  key: SHADOW_ML_INFERENCE_URL
+            - name: REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: pulseguard-platform-config
+                  key: REDIS_URL
+            - name: CORS_ORIGINS
+              valueFrom:
+                configMapKeyRef:
+                  name: pulseguard-platform-config
+                  key: CORS_ORIGINS
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8090
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8090
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: realtime-gateway
+  namespace: pulseguard
+spec:
+  selector:
+    app: realtime-gateway
+  ports:
+    - name: http
+      port: 8090
+      targetPort: 8090

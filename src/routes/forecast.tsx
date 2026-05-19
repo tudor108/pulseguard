@@ -3,12 +3,19 @@ import { AppShell } from "@/components/pulse/AppShell";
 import { ForecastChart, MultiForecastChart } from "@/components/pulse/Charts";
 import { buildForecast } from "@/lib/pulse/data";
 import { ScanLine, Sparkles } from "lucide-react";
+import { useActiveScenario } from "@/lib/pulse/scenario-context";
+import { usePulseStore } from "@/lib/pulse/app-state";
+import { useMemo } from "react";
 
 export const Route = createFileRoute("/forecast")({
   head: () => ({
     meta: [
       { title: "Prognoza AI - PulseGuard AI" },
-      { name: "description", content: "Prognoza predictiva pe 14 zile pentru risc de epuizare, presiune de lucru, oboseala si deficit de personal." },
+      {
+        name: "description",
+        content:
+          "Prognoza predictiva pe 14 zile pentru risc de epuizare, presiune de lucru, oboseala si deficit de personal.",
+      },
       { property: "og:title", content: "Prognoza AI - PulseGuard AI" },
       { property: "og:description", content: "Semnale prospective despre personal." },
     ],
@@ -17,17 +24,64 @@ export const Route = createFileRoute("/forecast")({
 });
 
 function ForecastPage() {
-  const f = buildForecast(30, 14);
+  const { active } = useActiveScenario();
+  const { telemetry } = usePulseStore();
+  const f = useMemo(() => {
+    if (!active) {
+      const base = buildForecast(30, 14);
+      if (!telemetry.staffCount) return base;
+      return base.map((point) =>
+        point.forecast
+          ? {
+              ...point,
+              burnoutRisk: Math.min(98, Math.round((point.burnoutRisk + telemetry.avgBurnout) / 2)),
+              workloadPressure: Math.min(
+                98,
+                Math.round((point.workloadPressure + telemetry.avgStress) / 2),
+              ),
+              fatigueIndex: Math.min(
+                98,
+                Math.round((point.fatigueIndex + telemetry.avgFatigue) / 2),
+              ),
+            }
+          : point,
+      );
+    }
+    return [
+      ...buildForecast(30, 0),
+      ...active.forecastSeries.map((point) => ({
+        date: point.date,
+        burnoutRisk: point.predictedEpuizareRisk,
+        workloadPressure: Math.min(98, point.predictedEpuizareRisk + 4),
+        shortageRisk: point.predictedStaffDeficitRisk,
+        fatigueIndex: point.predictedObosealaIndex,
+        interventionUrgency: Math.min(99, point.predictedEpuizareRisk - 2),
+        forecast: true as const,
+      })),
+    ];
+  }, [
+    active,
+    telemetry.avgBurnout,
+    telemetry.avgFatigue,
+    telemetry.avgStress,
+    telemetry.staffCount,
+  ]);
   return (
     <AppShell>
       <header className="mb-6 animate-fade-up flex items-end justify-between flex-wrap gap-3">
         <div>
-          <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground inline-flex items-center gap-2"><ScanLine className="h-3 w-3" /> Prognoza AI</div>
+          <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground inline-flex items-center gap-2">
+            <ScanLine className="h-3 w-3" /> Prognoza AI
+          </div>
           <h1 className="mt-2 text-2xl lg:text-3xl font-semibold">Orizont predictiv pe 14 zile</h1>
-          <p className="mt-1 text-sm text-muted-foreground max-w-2xl">Predictii live ale modelului pentru epuizare, presiune de lucru, oboseala, risc de deficit si urgenta interventiei.</p>
+          <p className="mt-1 text-sm text-muted-foreground max-w-2xl">
+            Predictii live ale modelului pentru epuizare, presiune de lucru, oboseala, risc de
+            deficit si urgenta interventiei.
+          </p>
         </div>
         <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-secondary/40 px-3 py-1.5 text-xs">
-          <Sparkles className="h-3 w-3 text-[var(--cyan-glow)]" /> Pulse-v2.4  -  Incredere 92%
+          <Sparkles className="h-3 w-3 text-[var(--cyan-glow)]" /> {telemetry.modelVersion} -
+          Incredere {telemetry.confidenceScore}%
         </div>
       </header>
 
@@ -44,6 +98,3 @@ function ForecastPage() {
     </AppShell>
   );
 }
-
-
-

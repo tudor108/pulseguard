@@ -4,8 +4,13 @@
 .idea
 node_modules
 dist
+.venv
+venv
+__pycache__
+*.py[cod]
 .tanstack
 .wrangler
+platform
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

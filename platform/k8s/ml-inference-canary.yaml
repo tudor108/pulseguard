@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ml-inference-canary
+  namespace: pulseguard
+  labels:
+    app: ml-inference
+    track: canary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ml-inference
+      track: canary
+  template:
+    metadata:
+      labels:
+        app: ml-inference
+        track: canary
+    spec:
+      serviceAccountName: ml-inference
+      containers:
+        - name: ml-inference
+          image: us-central1-docker.pkg.dev/project-73d1e32a-8e68-4750-93c/pulseguard/ml-inference:candidate
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8091
+          env:
+            - name: MODEL_DIR
+              value: /models
+            - name: MODEL_VERSION
+              value: candidate-canary
+            - name: SERVING_MODE
+              value: canary
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "768Mi"
+            limits:
+              cpu: "2"
+              memory: "2Gi"
+

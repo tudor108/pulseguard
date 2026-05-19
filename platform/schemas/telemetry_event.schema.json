@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pulseguard.ai/schemas/telemetry_event.v1.json",
+  "title": "PulseGuardTelemetryEvent",
+  "type": "object",
+  "required": [
+    "event_id",
+    "event_version",
+    "timestamp",
+    "device_id",
+    "staff_id",
+    "department",
+    "role",
+    "shift_id",
+    "shift_type",
+    "shift_minutes_elapsed",
+    "signals",
+    "operational_context",
+    "digital_twin"
+  ],
+  "properties": {
+    "event_id": { "type": "string" },
+    "event_version": { "type": "string", "const": "1.0" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "device_id": { "type": "string" },
+    "staff_id": { "type": "string" },
+    "department": { "type": "string", "enum": ["ICU", "ER", "Surgery", "Pediatrics", "Oncology"] },
+    "role": { "type": "string", "enum": ["doctor", "nurse", "coordinator"] },
+    "shift_id": { "type": "string" },
+    "shift_type": { "type": "string", "enum": ["day", "night", "off"] },
+    "shift_minutes_elapsed": { "type": "integer", "minimum": 0 },
+    "signals": {
+      "type": "object",
+      "required": [
+        "heart_rate_bpm",
+        "hrv_ms",
+        "stress_index",
+        "fatigue_index",
+        "skin_temperature_c",
+        "sleep_debt_hours",
+        "shift_duration_hours",
+        "overtime_hours",
+        "cognitive_load",
+        "movement_activity_level",
+        "emotional_stress_score",
+        "burnout_probability",
+        "patient_pressure_index",
+        "alarm_exposure_frequency",
+        "noise_exposure_db",
+        "night_shift_adaptation",
+        "recovery_score"
+      ],
+      "properties": {
+        "heart_rate_bpm": { "type": "number", "minimum": 35, "maximum": 210 },
+        "hrv_ms": { "type": "number", "minimum": 5, "maximum": 160 },
+        "stress_index": { "type": "number", "minimum": 0, "maximum": 100 },
+        "fatigue_index": { "type": "number", "minimum": 0, "maximum": 100 },
+        "skin_temperature_c": { "type": "number", "minimum": 32, "maximum": 40 },
+        "sleep_debt_hours": { "type": "number", "minimum": 0, "maximum": 24 },
+        "shift_duration_hours": { "type": "number", "minimum": 0, "maximum": 24 },
+        "overtime_hours": { "type": "number", "minimum": 0, "maximum": 48 },
+        "cognitive_load": { "type": "number", "minimum": 0, "maximum": 100 },
+        "movement_activity_level": { "type": "number", "minimum": 0, "maximum": 100 },
+        "emotional_stress_score": { "type": "number", "minimum": 0, "maximum": 100 },
+        "burnout_probability": { "type": "number", "minimum": 0, "maximum": 1 },
+        "patient_pressure_index": { "type": "number", "minimum": 0, "maximum": 100 },
+        "alarm_exposure_frequency": { "type": "number", "minimum": 0, "maximum": 120 },
+        "noise_exposure_db": { "type": "number", "minimum": 20, "maximum": 120 },
+        "night_shift_adaptation": { "type": "number", "minimum": 0, "maximum": 1 },
+        "recovery_score": { "type": "number", "minimum": 0, "maximum": 100 }
+      }
+    },
+    "operational_context": {
+      "type": "object",
+      "required": ["patient_count", "acuity_index", "staffing_ratio", "active_alarms", "weekend", "emergency_surge", "load_intensity"],
+      "properties": {
+        "patient_count": { "type": "integer", "minimum": 0 },
+        "acuity_index": { "type": "number", "minimum": 0, "maximum": 1 },
+        "staffing_ratio": { "type": "number", "minimum": 0 },
+        "active_alarms": { "type": "integer", "minimum": 0 },
+        "weekend": { "type": "boolean" },
+        "emergency_surge": { "type": "boolean" },
+        "anomaly_type": { "type": ["string", "null"] },
+        "load_intensity": { "type": "number", "minimum": 0, "maximum": 1.5 }
+      }
+    },
+    "digital_twin": {
+      "type": "object",
+      "required": ["resilience", "recovery_rate", "overtime_sensitivity", "burnout_susceptibility", "sleep_quality"],
+      "properties": {
+        "resilience": { "type": "number", "minimum": 0, "maximum": 1 },
+        "recovery_rate": { "type": "number", "minimum": 0, "maximum": 1 },
+        "overtime_sensitivity": { "type": "number", "minimum": 0, "maximum": 1 },
+        "burnout_susceptibility": { "type": "number", "minimum": 0, "maximum": 1 },
+        "sleep_quality": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    }
+  }
+}
+

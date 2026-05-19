@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pulseguard.ai/schemas/prediction_event.v1.json",
+  "title": "PulseGuardPredictionEvent",
+  "type": "object",
+  "required": ["staff_id", "department", "timestamp", "model_version", "burnout_probability", "risk_level"],
+  "properties": {
+    "staff_id": { "type": "string" },
+    "department": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "model_version": { "type": "string" },
+    "burnout_probability": { "type": "number", "minimum": 0, "maximum": 1 },
+    "fatigue_forecast_6h": { "type": "number", "minimum": 0, "maximum": 100 },
+    "fatigue_forecast_24h": { "type": "number", "minimum": 0, "maximum": 100 },
+    "workload_forecast_24h": { "type": "number", "minimum": 0, "maximum": 100 },
+    "anomaly_score": { "type": "number" },
+    "is_anomaly": { "type": "boolean" },
+    "risk_level": { "type": "string", "enum": ["low", "moderate", "high", "critical"] },
+    "top_drivers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "value", "weight"],
+        "properties": {
+          "name": { "type": "string" },
+          "value": { "type": "number" },
+          "weight": { "type": "number" }
+        }
+      }
+    },
+    "recommendations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["action", "priority", "rationale", "expected_impact"],
+        "properties": {
+          "action": { "type": "string" },
+          "priority": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+          "rationale": { "type": "string" },
+          "expected_impact": { "type": "number" }
+        }
+      }
+    }
+  }
+}
+

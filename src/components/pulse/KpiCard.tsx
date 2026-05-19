@@ -19,7 +19,7 @@ type Props = {
 const toneRing: Record<NonNullable<Props["tone"]>, string> = {
   primary: "from-[var(--cyan-glow)]/30 to-[var(--indigo-glow)]/20",
   warning: "from-warning/30 to-warning/10",
-  danger:  "from-danger/35 to-danger/10",
+  danger: "from-danger/35 to-danger/10",
   success: "from-success/30 to-success/10",
 };
 
@@ -30,19 +30,34 @@ function riskLevelClass(value: number, highRisk?: boolean) {
   return "risk-low";
 }
 
-export function KpiCard({ label, value, unit, delta, trend = "stable", icon: Icon, tone = "primary", spark, decimals = 0, highRisk }: Props) {
+export function KpiCard({
+  label,
+  value,
+  unit,
+  delta,
+  trend = "stable",
+  icon: Icon,
+  tone = "primary",
+  spark,
+  decimals = 0,
+  highRisk,
+}: Props) {
   const TrendIcon = trend === "up" ? ArrowUpRight : trend === "down" ? ArrowDownRight : Minus;
-  const trendColor = trend === "up" ? "text-danger" : trend === "down" ? "text-success" : "text-muted-foreground";
+  const trendColor =
+    trend === "up" ? "text-danger" : trend === "down" ? "text-success" : "text-muted-foreground";
   const ref = useRef<HTMLDivElement>(null);
 
   const handleMove = (e: MouseEvent<HTMLDivElement>) => {
-    const el = ref.current; if (!el) return;
+    const el = ref.current;
+    if (!el) return;
     const r = el.getBoundingClientRect();
     const x = (e.clientX - r.left) / r.width - 0.5;
     const y = (e.clientY - r.top) / r.height - 0.5;
     el.style.transform = `perspective(900px) rotateX(${(-y * 4).toFixed(2)}deg) rotateY(${(x * 5).toFixed(2)}deg) translateY(-3px)`;
   };
-  const reset = () => { if (ref.current) ref.current.style.transform = ""; };
+  const reset = () => {
+    if (ref.current) ref.current.style.transform = "";
+  };
 
   return (
     <div
@@ -51,14 +66,21 @@ export function KpiCard({ label, value, unit, delta, trend = "stable", icon: Ico
       onMouseLeave={reset}
       className={cn(
         "group relative glass luminous-border rounded-2xl p-5 overflow-hidden animate-fade-up hover-lift will-change-transform",
-        riskLevelClass(value, highRisk)
+        riskLevelClass(value, highRisk),
       )}
       style={{ transition: "transform 220ms cubic-bezier(.2,.8,.2,1), box-shadow 280ms" }}
     >
-      <div className={cn("absolute -top-12 -right-12 h-32 w-32 rounded-full blur-3xl bg-gradient-to-br opacity-70", toneRing[tone])} />
+      <div
+        className={cn(
+          "absolute -top-12 -right-12 h-32 w-32 rounded-full blur-3xl bg-gradient-to-br opacity-70",
+          toneRing[tone],
+        )}
+      />
       <div className="relative flex items-start justify-between">
         <div>
-          <div className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">{label}</div>
+          <div className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+            {label}
+          </div>
           <div className="mt-2 flex items-baseline gap-1.5">
             <div className="text-3xl font-semibold tracking-tight tabular-nums">
               <AnimatedNumber value={value} decimals={decimals} />
@@ -74,7 +96,8 @@ export function KpiCard({ label, value, unit, delta, trend = "stable", icon: Ico
         {typeof delta === "number" && (
           <div className={cn("inline-flex items-center gap-1 text-xs font-medium", trendColor)}>
             <TrendIcon className="h-3.5 w-3.5" />
-            {delta > 0 ? "+" : ""}{delta}% <span className="text-muted-foreground font-normal">fata de 7 zile</span>
+            {delta > 0 ? "+" : ""}
+            {delta}% <span className="text-muted-foreground font-normal">fata de 7 zile</span>
           </div>
         )}
         {spark && <Sparkline data={spark} />}
@@ -84,14 +107,18 @@ export function KpiCard({ label, value, unit, delta, trend = "stable", icon: Ico
 }
 
 function Sparkline({ data }: { data: number[] }) {
-  const w = 80, h = 24;
-  const min = Math.min(...data), max = Math.max(...data);
+  const w = 80,
+    h = 24;
+  const min = Math.min(...data),
+    max = Math.max(...data);
   const range = max - min || 1;
-  const points = data.map((v, i) => {
-    const x = (i / (data.length - 1)) * w;
-    const y = h - ((v - min) / range) * h;
-    return `${x},${y}`;
-  }).join(" ");
+  const points = data
+    .map((v, i) => {
+      const x = (i / (data.length - 1)) * w;
+      const y = h - ((v - min) / range) * h;
+      return `${x},${y}`;
+    })
+    .join(" ");
   const len = data.length * 6;
   return (
     <svg width={w} height={h} className="opacity-80">

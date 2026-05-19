@@ -1,42 +1,77 @@
 import { useEffect, useState } from "react";
-import { Play, GitCompareArrows, BellRing, FileDown, Loader2, CheckCircle2, X, AlertOctagon, ArrowUpRight, Activity, LineChart, Wand2, Clock, Building2, Eye, ShieldAlert, UserPlus, TimerReset, Users, RefreshCw } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import {
+  Play,
+  GitCompareArrows,
+  BellRing,
+  FileDown,
+  Loader2,
+  CheckCircle2,
+  X,
+  AlertOctagon,
+  ArrowUpRight,
+  Activity,
+  LineChart,
+  Wand2,
+  Clock,
+  Building2,
+  Eye,
+  ShieldAlert,
+  UserPlus,
+  TimerReset,
+  Users,
+  RefreshCw,
+} from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { exportForecastPdf } from "@/lib/pulse/export-pdf";
 import { useProfile } from "@/lib/pulse/profile";
+import { usePulseStore } from "@/lib/pulse/app-state";
+import { useActiveScenario } from "@/lib/pulse/scenario-context";
+import { useNavigate } from "@tanstack/react-router";
+import type { ProductAlert } from "@/lib/pulse/services";
 
 type RunState = "idle" | "loading" | "success";
 
-type AlertSeverity = "critical" | "warning" | "info";
-type AlertCard = {
-  id: string;
-  severity: AlertSeverity;
-  title: string;
-  detail: string;
-  unit: string;
-  driver: string;
-  time: string;
-};
-
-const CRITICAL_ALERTS: AlertCard[] = [
-  { id: "c-1", severity: "critical", title: "Riscul turei de noapte ATI a crescut cu 18%", detail: "Indicele de epuizare pe ultimele 7 zile a intrat in zona critica pe rotatia de noapte.", unit: "Unitate Terapie Intensiva", driver: "Ture de noapte grupate", time: "acum 12 min" },
-  { id: "c-2", severity: "critical", title: "Orele suplimentare din UPU au trecut pragul", detail: "Media este 11.4 ore pe persoana pe saptamana fata de tinta sigura de 8 ore.", unit: "Departament Urgente", driver: "Ore suplimentare", time: "acum 38 min" },
-  { id: "c-3", severity: "critical", title: "Chirurgia are 3 ture consecutive subdimensionate", detail: "Raportul pacienti personal a ajuns la 1:7 in ultimele 3 rotatii de noapte.", unit: "Sectie Chirurgie", driver: "Raport pacienti/personal", time: "acum 1 h" },
-];
-
-const WATCHLIST_ALERTS: AlertCard[] = [
-  { id: "w-1", severity: "warning", title: "Presiunea sezoniera in Pediatrie este in crestere", detail: "Modelul estimeaza +22% internari in urmatoarele 14 zile.", unit: "Pediatrie", driver: "Internari sezoniere", time: "acum 2 h" },
-  { id: "w-2", severity: "warning", title: "Oncologia are timp de recuperare sub tinta", detail: "Recuperarea medie intre ture a scazut la 9.2 ore fata de tinta de 11 ore.", unit: "Oncologie", driver: "Recuperare intre ture", time: "acum 3 h" },
-  { id: "w-3", severity: "warning", title: "Rezerva de personal pentru weekend este sub tinta", detail: "Acoperirea cu personal de rezerva este 62% fata de tinta operationala de 80%.", unit: "Multi-sectie", driver: "Acoperire rezerva", time: "acum 5 h" },
-];
-
 const RECOMMENDED_ACTIONS = [
-  { id: "ra-1", icon: UserPlus,    title: "Adauga acoperire temporara pe tura de noapte", detail: "Muta 2 asistenti din rezerva in rotatia de noapte ATI pentru 7 zile." },
-  { id: "ra-2", icon: TimerReset,  title: "Redu orele suplimentare pentru personalul expus", detail: "Limiteaza orele suplimentare la 8 ore pe saptamana pentru asistentele UPU peste prag." },
-  { id: "ra-3", icon: Users,       title: "Redistribuie personalul senior pe turele cu presiune mare", detail: "Reechilibreaza acoperirea seniorilor in ferestrele de noapte ATI, UPU si Chirurgie." },
-  { id: "ra-4", icon: RefreshCw,   title: "Reevalueaza riscul peste 72 de ore",                       detail: "Programeaza o reprognoza automata si o revizuire operativa in 72h." },
+  {
+    id: "ra-1",
+    icon: UserPlus,
+    title: "Adauga acoperire temporara pe tura de noapte",
+    detail: "Muta 2 asistenti din rezerva in rotatia de noapte ATI pentru 7 zile.",
+  },
+  {
+    id: "ra-2",
+    icon: TimerReset,
+    title: "Redu orele suplimentare pentru personalul expus",
+    detail: "Limiteaza orele suplimentare la 8 ore pe saptamana pentru asistentele UPU peste prag.",
+  },
+  {
+    id: "ra-3",
+    icon: Users,
+    title: "Redistribuie personalul senior pe turele cu presiune mare",
+    detail: "Reechilibreaza acoperirea seniorilor in ferestrele de noapte ATI, UPU si Chirurgie.",
+  },
+  {
+    id: "ra-4",
+    icon: RefreshCw,
+    title: "Reevalueaza riscul peste 72 de ore",
+    detail: "Programeaza o reprognoza automata si o revizuire operativa in 72h.",
+  },
 ];
 
 const SCENARIOS = [
@@ -44,7 +79,12 @@ const SCENARIOS = [
   { metric: "Acoperire tura de noapte", current: "82%", recommended: "96%", delta: "+14 pct" },
   { metric: "Ore suplimentare pe persoana", current: "11.4h", recommended: "7.2h", delta: "-4.2h" },
   { metric: "Indice oboseala", current: "0.71", recommended: "0.48", delta: "-0.23" },
-  { metric: "Urgenta interventie", current: "Ridicat", recommended: "Moderat", delta: "scade un nivel" },
+  {
+    metric: "Urgenta interventie",
+    current: "Ridicat",
+    recommended: "Moderat",
+    delta: "scade un nivel",
+  },
 ];
 
 export function ActionBar() {
@@ -52,9 +92,18 @@ export function ActionBar() {
   const [alertsOpen, setAlertsOpen] = useState(false);
   const [runState, setRunState] = useState<RunState>("idle");
   const [exportState, setExportState] = useState<RunState>("idle");
-  const [critical, setCritical] = useState<AlertCard[]>(CRITICAL_ALERTS);
-  const [watchlist, setWatchlist] = useState<AlertCard[]>(WATCHLIST_ALERTS);
   const { unit, coordinator } = useProfile();
+  const { active } = useActiveScenario();
+  const navigate = useNavigate();
+  const {
+    unreadAlerts,
+    telemetry,
+    markAlertRead,
+    markAllAlertsRead,
+    addIntervention,
+    applyRecommendedPlan,
+    saveReport,
+  } = usePulseStore();
 
   // Allow any "notification bell" elsewhere to open the drawer.
   useEffect(() => {
@@ -63,12 +112,15 @@ export function ActionBar() {
     return () => window.removeEventListener("pulseguard:open-alerts", open);
   }, []);
 
-  const totalAlerts = critical.length + watchlist.length;
+  const critical = unreadAlerts.filter((alert) => alert.level === "critical");
+  const watchlist = unreadAlerts.filter((alert) => alert.level !== "critical");
+  const totalAlerts = unreadAlerts.length;
 
-  const dismissAlert = (id: string, scope: "critical" | "watchlist") => {
-    if (scope === "critical") setCritical((xs) => xs.filter((a) => a.id !== id));
-    else setWatchlist((xs) => xs.filter((a) => a.id !== id));
-    toast.success("Alerta eliminata", { description: "Eliminata din lista activa de monitorizare." });
+  const dismissAlert = (id: string) => {
+    markAlertRead(id);
+    toast.success("Alerta marcata ca citita", {
+      description: "A fost scoasa din lista activa de monitorizare.",
+    });
   };
 
   const runForecast = () => {
@@ -78,7 +130,10 @@ export function ActionBar() {
     window.dispatchEvent(new CustomEvent("pulseguard:run-forecast"));
     setTimeout(() => {
       setRunState("success");
-      toast.success("Prognoza generata", { id: "run-forecast", description: "Proiectia de risc pe 14 zile si planul de interventie au fost actualizate." });
+      toast.success("Prognoza generata", {
+        id: "run-forecast",
+        description: "Proiectia de risc pe 14 zile si planul de interventie au fost actualizate.",
+      });
       setTimeout(() => setRunState("idle"), 1600);
     }, 2900);
   };
@@ -87,7 +142,24 @@ export function ActionBar() {
     if (exportState === "loading") return;
     setExportState("loading");
     try {
-      await exportForecastPdf({ unit, coordinator, riskScore: 78, riskLevel: "Ridicat" });
+      const riskScore = active?.riskScore ?? Math.round(telemetry.avgBurnout || 78);
+      const riskLevel = riskScore >= 75 ? "Critic" : riskScore >= 60 ? "Ridicat" : "Moderat";
+      await exportForecastPdf({
+        unit: active?.department ?? unit,
+        coordinator,
+        riskScore,
+        riskLevel,
+      });
+      saveReport({
+        title: active?.name ?? "Raport prognoza risc epuizare",
+        department: active?.department ?? unit,
+        coordinator,
+        riskScore,
+        riskLevel,
+        source: active ? "scenario" : "telemetry",
+        scenarioId: active?.id,
+        exported: true,
+      });
       setExportState("success");
     } catch {
       toast.error("Export esuat", { description: "Nu s-a putut genera PDF-ul." });
@@ -107,16 +179,22 @@ export function ActionBar() {
           runState === "success"
             ? "bg-gradient-to-r from-success to-[var(--cyan-glow)]"
             : "bg-gradient-to-r from-[var(--cyan-glow)] to-[var(--indigo-glow)]",
-          runState === "loading" && "opacity-90 cursor-wait"
+          runState === "loading" && "opacity-90 cursor-wait",
         )}
         aria-label="Ruleaza prognoza"
       >
         {runState === "loading" ? (
-          <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Se calculeaza...</>
+          <>
+            <Loader2 className="h-3.5 w-3.5 animate-spin" /> Se calculeaza...
+          </>
         ) : runState === "success" ? (
-          <><CheckCircle2 className="h-3.5 w-3.5" /> Prognoza Gata</>
+          <>
+            <CheckCircle2 className="h-3.5 w-3.5" /> Prognoza Gata
+          </>
         ) : (
-          <><Play className="h-3.5 w-3.5 fill-current" /> Ruleaza Prognoza</>
+          <>
+            <Play className="h-3.5 w-3.5 fill-current" /> Ruleaza Prognoza
+          </>
         )}
       </button>
 
@@ -142,7 +220,10 @@ export function ActionBar() {
         <span className="absolute top-1 right-1 grid place-items-center h-4 w-4 rounded-full bg-danger text-[9px] font-bold text-background ring-2 ring-background/80">
           {totalAlerts}
         </span>
-        <span className="absolute top-1 right-1 h-4 w-4 rounded-full bg-danger/60 animate-ping" aria-hidden />
+        <span
+          className="absolute top-1 right-1 h-4 w-4 rounded-full bg-danger/60 animate-ping"
+          aria-hidden
+        />
       </button>
 
       {/* Exporta raport */}
@@ -151,14 +232,18 @@ export function ActionBar() {
         disabled={exportState === "loading"}
         className={cn(
           "hidden md:inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-secondary/40 px-2.5 py-2 text-xs font-medium whitespace-nowrap hover:bg-secondary/70 active:scale-[0.97] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
-          exportState === "success" && "border-success/60 text-success"
+          exportState === "success" && "border-success/60 text-success",
         )}
         aria-label="Exporta raport"
         title="Exporta raport"
       >
-        {exportState === "loading" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> :
-         exportState === "success" ? <CheckCircle2 className="h-3.5 w-3.5" /> :
-         <FileDown className="h-3.5 w-3.5" />}
+        {exportState === "loading" ? (
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        ) : exportState === "success" ? (
+          <CheckCircle2 className="h-3.5 w-3.5" />
+        ) : (
+          <FileDown className="h-3.5 w-3.5" />
+        )}
         <span className="hidden xl:inline">Exporta</span>
       </button>
 
@@ -166,7 +251,9 @@ export function ActionBar() {
       <Dialog open={compareOpen} onOpenChange={setCompareOpen}>
         <DialogContent className="glass-strong border-border/60 max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2"><GitCompareArrows className="h-4 w-4 text-[var(--cyan-glow)]" /> Comparatie Scenarii</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <GitCompareArrows className="h-4 w-4 text-[var(--cyan-glow)]" /> Comparatie Scenarii
+            </DialogTitle>
             <DialogDescription>
               Planul actual de personal vs interventia recomandata de AI pentru urmatoarele 14 zile.
             </DialogDescription>
@@ -183,7 +270,10 @@ export function ActionBar() {
               </thead>
               <tbody>
                 {SCENARIOS.map((row, i) => (
-                  <tr key={row.metric} className={cn("border-t border-border/40", i % 2 && "bg-secondary/10")}>
+                  <tr
+                    key={row.metric}
+                    className={cn("border-t border-border/40", i % 2 && "bg-secondary/10")}
+                  >
                     <td className="px-3 py-2.5 font-medium">{row.metric}</td>
                     <td className="px-3 py-2.5 text-muted-foreground">{row.current}</td>
                     <td className="px-3 py-2.5 text-foreground">{row.recommended}</td>
@@ -198,9 +288,20 @@ export function ActionBar() {
             </table>
           </div>
           <DialogFooter>
-            <button onClick={() => setCompareOpen(false)} className="rounded-lg px-3 py-2 text-xs text-muted-foreground hover:text-foreground transition">Inchide</button>
             <button
-              onClick={() => { setCompareOpen(false); toast.success("Planul recomandat a fost aplicat in simulator"); }}
+              onClick={() => setCompareOpen(false)}
+              className="rounded-lg px-3 py-2 text-xs text-muted-foreground hover:text-foreground transition"
+            >
+              Inchide
+            </button>
+            <button
+              onClick={() => {
+                applyRecommendedPlan();
+                setCompareOpen(false);
+                toast.success("Planul recomandat a fost aplicat", {
+                  description: "Interventiile sunt actualizate in planificator.",
+                });
+              }}
               className="btn-glow inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[var(--cyan-glow)] to-[var(--indigo-glow)] px-3.5 py-2 text-xs font-semibold text-background ring-glow"
             >
               <CheckCircle2 className="h-3.5 w-3.5" /> Aplica Plan Recomandat
@@ -211,16 +312,25 @@ export function ActionBar() {
 
       {/* Alert Center Drawer */}
       <Sheet open={alertsOpen} onOpenChange={setAlertsOpen}>
-        <SheetContent side="right" className="glass-strong border-border/60 w-full sm:max-w-md p-0 flex flex-col">
+        <SheetContent
+          side="right"
+          className="glass-strong border-border/60 w-full sm:max-w-md p-0 flex flex-col"
+        >
           {/* 1. Header */}
           <SheetHeader className="relative p-5 border-b border-border/60">
-            <div className="absolute inset-0 bg-gradient-to-br from-danger/10 via-transparent to-[var(--cyan-glow)]/5 pointer-events-none" aria-hidden />
+            <div
+              className="absolute inset-0 bg-gradient-to-br from-danger/10 via-transparent to-[var(--cyan-glow)]/5 pointer-events-none"
+              aria-hidden
+            />
             <div className="relative flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <SheetTitle className="flex items-center gap-2 text-base">
                   <span className="relative grid h-7 w-7 place-items-center rounded-lg bg-danger/15 text-danger">
                     <AlertOctagon className="h-4 w-4" />
-                    <span className="absolute inset-0 rounded-lg bg-danger/40 animate-ping opacity-60" aria-hidden />
+                    <span
+                      className="absolute inset-0 rounded-lg bg-danger/40 animate-ping opacity-60"
+                      aria-hidden
+                    />
                   </span>
                   Centru Alerte Epuizare
                 </SheetTitle>
@@ -228,12 +338,14 @@ export function ActionBar() {
                   Semnale live de risc operational - {totalAlerts} active
                 </SheetDescription>
               </div>
-              <div className={cn(
-                "shrink-0 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider",
-                critical.length > 0
-                  ? "border-danger/40 bg-danger/10 text-danger"
-                  : "border-success/40 bg-success/10 text-success"
-              )}>
+              <div
+                className={cn(
+                  "shrink-0 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider",
+                  critical.length > 0
+                    ? "border-danger/40 bg-danger/10 text-danger"
+                    : "border-success/40 bg-success/10 text-success",
+                )}
+              >
                 <Activity className="h-3 w-3" />
                 {critical.length > 0 ? "Ridicat" : "Stabil"}
               </div>
@@ -257,7 +369,17 @@ export function ActionBar() {
                     key={a.id}
                     alert={a}
                     index={i}
-                    onDismiss={() => dismissAlert(a.id, "critical")}
+                    onDismiss={() => dismissAlert(a.id)}
+                    onForecast={() => {
+                      markAlertRead(a.id);
+                      navigate({ to: "/forecast" });
+                    }}
+                    onGeneratePlan={() => {
+                      addIntervention(interventionFromAlert(a));
+                      toast.success("Plan de actiune generat", {
+                        description: `Adaptat pentru ${a.department}`,
+                      });
+                    }}
                   />
                 ))
               )}
@@ -278,7 +400,17 @@ export function ActionBar() {
                     key={a.id}
                     alert={a}
                     index={i + critical.length}
-                    onDismiss={() => dismissAlert(a.id, "watchlist")}
+                    onDismiss={() => dismissAlert(a.id)}
+                    onForecast={() => {
+                      markAlertRead(a.id);
+                      navigate({ to: "/forecast" });
+                    }}
+                    onGeneratePlan={() => {
+                      addIntervention(interventionFromAlert(a));
+                      toast.success("Plan de actiune generat", {
+                        description: `Adaptat pentru ${a.department}`,
+                      });
+                    }}
                   />
                 ))
               )}
@@ -297,7 +429,10 @@ export function ActionBar() {
                   <div
                     key={a.id}
                     className="group rounded-xl border border-border/60 bg-secondary/30 p-3 hover:bg-secondary/50 hover:border-[var(--cyan-glow)]/50 transition animate-fade-in"
-                    style={{ animationDelay: `${(i + critical.length + watchlist.length) * 60}ms`, animationFillMode: "both" }}
+                    style={{
+                      animationDelay: `${(i + critical.length + watchlist.length) * 60}ms`,
+                      animationFillMode: "both",
+                    }}
                   >
                     <div className="flex items-start gap-3">
                       <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-[var(--cyan-glow)]/10 text-[var(--cyan-glow)] group-hover:scale-105 transition">
@@ -308,7 +443,19 @@ export function ActionBar() {
                         <div className="text-[11.5px] text-muted-foreground mt-0.5">{a.detail}</div>
                       </div>
                       <button
-                        onClick={() => toast.success("Actiune adaugata", { description: a.title })}
+                        onClick={() => {
+                          addIntervention({
+                            id: `quick-${a.id}`,
+                            title: a.title,
+                            detail: a.detail,
+                            department: unit,
+                            impact: i < 2 ? "ridicat" : "mediu",
+                            eta: i === 3 ? "72 ore" : "Tura urmatoare",
+                            source: "plan",
+                            status: "approved",
+                          });
+                          toast.success("Actiune aprobata", { description: a.title });
+                        }}
                         className="shrink-0 self-center rounded-md border border-border/60 bg-background/40 px-2 py-1 text-[10px] font-medium hover:bg-[var(--cyan-glow)]/10 hover:border-[var(--cyan-glow)]/50 transition"
                       >
                         Aplica
@@ -324,14 +471,17 @@ export function ActionBar() {
           <div className="border-t border-border/60 p-3 flex items-center justify-between bg-background/40 backdrop-blur">
             <button
               onClick={() => {
-                setCritical([]); setWatchlist([]);
+                markAllAlertsRead();
                 toast.success("Toate alertele au fost marcate ca citite");
               }}
               className="text-xs text-muted-foreground hover:text-foreground transition"
             >
               Marcheaza toate ca citite
             </button>
-            <button onClick={() => setAlertsOpen(false)} className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition">
+            <button
+              onClick={() => setAlertsOpen(false)}
+              className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition"
+            >
               <X className="h-3.5 w-3.5" /> Inchide
             </button>
           </div>
@@ -344,7 +494,11 @@ export function ActionBar() {
 // --- Drawer subcomponents ---------------------------------------------------
 
 function Section({
-  title, count, tone, icon, children,
+  title,
+  count,
+  tone,
+  icon,
+  children,
 }: {
   title: string;
   count: number;
@@ -353,17 +507,25 @@ function Section({
   children: React.ReactNode;
 }) {
   const toneClass =
-    tone === "danger" ? "text-danger bg-danger/10 border-danger/30"
-    : tone === "warning" ? "text-warning bg-warning/10 border-warning/30"
-    : "text-[var(--cyan-glow)] bg-[var(--cyan-glow)]/10 border-[var(--cyan-glow)]/30";
+    tone === "danger"
+      ? "text-danger bg-danger/10 border-danger/30"
+      : tone === "warning"
+        ? "text-warning bg-warning/10 border-warning/30"
+        : "text-[var(--cyan-glow)] bg-[var(--cyan-glow)]/10 border-[var(--cyan-glow)]/30";
   return (
     <section>
       <header className="flex items-center justify-between mb-2 px-0.5">
         <div className="flex items-center gap-2">
-          <span className={cn("grid h-6 w-6 place-items-center rounded-md border", toneClass)}>{icon}</span>
-          <h3 className="text-[11px] font-bold uppercase tracking-wider text-foreground/90">{title}</h3>
+          <span className={cn("grid h-6 w-6 place-items-center rounded-md border", toneClass)}>
+            {icon}
+          </span>
+          <h3 className="text-[11px] font-bold uppercase tracking-wider text-foreground/90">
+            {title}
+          </h3>
         </div>
-        <span className="text-[10px] font-semibold text-muted-foreground tabular-nums">{count}</span>
+        <span className="text-[10px] font-semibold text-muted-foreground tabular-nums">
+          {count}
+        </span>
       </header>
       <div className="space-y-2">{children}</div>
     </section>
@@ -379,18 +541,39 @@ function EmptyRow({ label }: { label: string }) {
 }
 
 function AlertCardView({
-  alert, index, onDismiss,
+  alert,
+  index,
+  onDismiss,
+  onForecast,
+  onGeneratePlan,
 }: {
-  alert: AlertCard;
+  alert: ProductAlert;
   index: number;
   onDismiss: () => void;
+  onForecast: () => void;
+  onGeneratePlan: () => void;
 }) {
   const sevMeta =
-    alert.severity === "critical"
-      ? { label: "Critic", text: "text-danger", chip: "bg-danger/15 text-danger border-danger/40", ring: "before:bg-danger" }
-      : alert.severity === "warning"
-      ? { label: "Atentie", text: "text-warning", chip: "bg-warning/15 text-warning border-warning/40", ring: "before:bg-warning" }
-      : { label: "Info",     text: "text-[var(--cyan-glow)]", chip: "bg-[var(--cyan-glow)]/15 text-[var(--cyan-glow)] border-[var(--cyan-glow)]/40", ring: "before:bg-[var(--cyan-glow)]" };
+    alert.level === "critical"
+      ? {
+          label: "Critic",
+          text: "text-danger",
+          chip: "bg-danger/15 text-danger border-danger/40",
+          ring: "before:bg-danger",
+        }
+      : alert.level === "warning"
+        ? {
+            label: "Atentie",
+            text: "text-warning",
+            chip: "bg-warning/15 text-warning border-warning/40",
+            ring: "before:bg-warning",
+          }
+        : {
+            label: "Info",
+            text: "text-[var(--cyan-glow)]",
+            chip: "bg-[var(--cyan-glow)]/15 text-[var(--cyan-glow)] border-[var(--cyan-glow)]/40",
+            ring: "before:bg-[var(--cyan-glow)]",
+          };
 
   return (
     <article
@@ -398,18 +581,26 @@ function AlertCardView({
         "group relative rounded-xl border border-border/60 bg-secondary/30 p-3.5 hover:bg-secondary/50 hover:-translate-y-0.5 transition animate-fade-in",
         "before:content-[''] before:absolute before:inset-y-3 before:left-0 before:w-[3px] before:rounded-r",
         sevMeta.ring,
-        alert.severity === "critical" && "shadow-[0_8px_24px_-12px_color-mix(in_oklab,var(--danger)_55%,transparent)]"
+        alert.level === "critical" &&
+          "shadow-[0_8px_24px_-12px_color-mix(in_oklab,var(--danger)_55%,transparent)]",
       )}
       style={{ animationDelay: `${index * 60}ms`, animationFillMode: "both" }}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
-          <span className={cn(
-            "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider",
-            sevMeta.chip,
-            alert.severity === "critical" && "animate-pulse-soft"
-          )}>
-            <span className={cn("h-1.5 w-1.5 rounded-full bg-current", alert.severity === "critical" && "animate-ping")} />
+          <span
+            className={cn(
+              "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider",
+              sevMeta.chip,
+              alert.level === "critical" && "animate-pulse-soft",
+            )}
+          >
+            <span
+              className={cn(
+                "h-1.5 w-1.5 rounded-full bg-current",
+                alert.level === "critical" && "animate-ping",
+              )}
+            />
             {sevMeta.label}
           </span>
           <span className="inline-flex items-center gap-1 text-[10.5px] text-muted-foreground">
@@ -429,19 +620,24 @@ function AlertCardView({
       <p className="text-[11.5px] text-muted-foreground mt-1 leading-relaxed">{alert.detail}</p>
 
       <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10.5px] text-muted-foreground">
-        <span className="inline-flex items-center gap-1"><Building2 className="h-3 w-3" /> {alert.unit}</span>
-        <span className="inline-flex items-center gap-1"><Activity className="h-3 w-3" /> Factor principal: <span className="text-foreground/80 font-medium">{alert.driver}</span></span>
+        <span className="inline-flex items-center gap-1">
+          <Building2 className="h-3 w-3" /> {alert.department}
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <Activity className="h-3 w-3" /> Sursa:{" "}
+          <span className="text-foreground/80 font-medium">{alert.source}</span>
+        </span>
       </div>
 
       <div className="mt-3 flex items-center gap-2">
         <button
-          onClick={() => toast.success("Deschidere prognoza", { description: `${alert.unit} - vizualizare 14 zile` })}
+          onClick={onForecast}
           className="inline-flex items-center gap-1 rounded-md border border-border/60 bg-background/40 px-2 py-1 text-[10.5px] font-medium hover:bg-[var(--cyan-glow)]/10 hover:border-[var(--cyan-glow)]/50 transition"
         >
           <LineChart className="h-3 w-3" /> Vezi Prognoza
         </button>
         <button
-          onClick={() => toast.success("Plan de actiune generat", { description: `Adaptat pentru ${alert.unit}` })}
+          onClick={onGeneratePlan}
           className="inline-flex items-center gap-1 rounded-md bg-gradient-to-r from-[var(--cyan-glow)] to-[var(--indigo-glow)] px-2 py-1 text-[10.5px] font-semibold text-background ring-glow hover:opacity-95 transition"
         >
           <Wand2 className="h-3 w-3" /> Genereaza Plan de Actiune
@@ -451,6 +647,19 @@ function AlertCardView({
   );
 }
 
-
-
-
+function interventionFromAlert(alert: ProductAlert) {
+  return {
+    id: `alert-plan-${alert.id}`,
+    title:
+      alert.level === "critical"
+        ? "Activeaza interventie urgenta pentru alerta critica"
+        : "Monitorizeaza si ajusteaza planul de tura",
+    detail: alert.detail,
+    department: alert.department,
+    impact: alert.level === "critical" ? ("ridicat" as const) : ("mediu" as const),
+    eta: alert.level === "critical" ? "Tura urmatoare" : "24 ore",
+    source: alert.source === "telemetry" ? ("telemetry" as const) : ("plan" as const),
+    status: "approved" as const,
+    evidence: alert.title,
+  };
+}

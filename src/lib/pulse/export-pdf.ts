@@ -40,12 +40,19 @@ export async function exportForecastPdf(ctx: ExportaContext) {
   doc.text("Indicator risc operational", 40, 130);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(11);
-  doc.text(`Scor risc curent: ${(ctx.riskScore ?? 78).toFixed(0)} / 100   (${ctx.riskLevel ?? "Ridicat"})`, 40, 150);
+  doc.text(
+    `Scor risc curent: ${(ctx.riskScore ?? 78).toFixed(0)} / 100   (${ctx.riskLevel ?? "Ridicat"})`,
+    40,
+    150,
+  );
 
   doc.setDrawColor(80, 180, 220);
   doc.setLineWidth(1.2);
   const points = [55, 58, 62, 60, 67, 71, 74, 72, 78, 76, 80, 78];
-  const x0 = 40, y0 = 200, w = W - 80, h = 140;
+  const x0 = 40,
+    y0 = 200,
+    w = W - 80,
+    h = 140;
   doc.setDrawColor(220, 220, 230);
   doc.rect(x0, y0, w, h);
   doc.setDrawColor(80, 180, 220);

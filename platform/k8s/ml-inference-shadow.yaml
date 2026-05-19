@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ml-inference-shadow
+  namespace: pulseguard
+  labels:
+    app: ml-inference
+    track: shadow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ml-inference
+      track: shadow
+  template:
+    metadata:
+      labels:
+        app: ml-inference
+        track: shadow
+    spec:
+      serviceAccountName: ml-inference
+      containers:
+        - name: ml-inference
+          image: us-central1-docker.pkg.dev/project-73d1e32a-8e68-4750-93c/pulseguard/ml-inference:candidate
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8091
+          env:
+            - name: MODEL_DIR
+              value: /models
+            - name: MODEL_VERSION
+              value: candidate-shadow
+            - name: SERVING_MODE
+              value: shadow
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "768Mi"
+            limits:
+              cpu: "2"
+              memory: "2Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ml-inference-shadow
+  namespace: pulseguard
+spec:
+  selector:
+    app: ml-inference
+    track: shadow
+  ports:
+    - name: http
+      port: 8091
+      targetPort: 8091
+

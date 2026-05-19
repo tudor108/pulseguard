@@ -1,12 +1,25 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import {
-  Sparkles, Wand2, Loader2, CheckCircle2, Eraser, Lightbulb, FlaskConical,
-  Activity, ShieldAlert, FileText, RotateCw, Save, Download, ArrowRight,
+  Sparkles,
+  Wand2,
+  Loader2,
+  CheckCircle2,
+  Eraser,
+  Lightbulb,
+  FlaskConical,
+  Activity,
+  ShieldAlert,
+  FileText,
+  RotateCw,
+  Save,
+  Download,
+  ArrowRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useActiveScenario, type GeneratScenario } from "@/lib/pulse/scenario-context";
+import { usePulseStore } from "@/lib/pulse/app-state";
 
 const CHIPS = [
   "ATI aglomerat",
@@ -36,7 +49,7 @@ const GEN_STEPS = [
 type GenerateScenarioResponse = {
   ok: boolean;
   source?: "foundry" | "local";
-  mode?: "chat" | "needs_details" | "scenario";
+  mode?: "chat" | "needs_details" | "scenario" | "out_of_scope" | "security_refusal";
   message?: string;
   missingInfo?: string[];
   scenario?: GeneratScenario;
@@ -45,7 +58,7 @@ type GenerateScenarioResponse = {
 };
 
 type AgentRunResult = {
-  mode: "chat" | "needs_details" | "scenario";
+  mode: "chat" | "needs_details" | "scenario" | "out_of_scope" | "security_refusal";
   message?: string;
   missingInfo: string[];
   source: "foundry" | "local";
@@ -60,9 +73,15 @@ type ChatMessage = {
   meta?: string;
 };
 
-function localConversationFallback(prompt: string, fallback: (prompt: string) => GeneratScenario): AgentRunResult {
+function localConversationFallback(
+  prompt: string,
+  fallback: (prompt: string) => GeneratScenario,
+): AgentRunResult {
   const text = prompt.toLowerCase();
-  const hasHealthcareContext = /spital|sectie|ati|terapie intensiva|upu|urgente|chirurg|oncolog|pediatr|medic|asistent|pacient|tura|ocupare|personal|concedii medicale|ore suplimentare|epuizare/.test(text);
+  const hasHealthcareContext =
+    /spital|sectie|ati|terapie intensiva|upu|urgente|chirurg|oncolog|pediatr|medic|asistent|pacient|tura|ocupare|personal|concedii medicale|ore suplimentare|epuizare/.test(
+      text,
+    );
   const signalCount = [
     /\d+/.test(text),
     /pacient|internar|ocupare|capacitate/.test(text),
@@ -100,7 +119,8 @@ function localConversationFallback(prompt: string, fallback: (prompt: string) =>
     mode: "chat",
     source: "local",
     missingInfo: [],
-    message: "Sunt bine, sunt aici sa te ajut sa intelegi riscul de epuizare din spital. Spune-mi sectia, pacientii, personalul disponibil si problema principala.",
+    message:
+      "Sunt bine, sunt aici sa te ajut sa intelegi riscul de epuizare din spital. Spune-mi sectia, pacientii, personalul disponibil si problema principala.",
   };
 }
 
@@ -114,9 +134,14 @@ async function generateScenarioWithAgent(
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ prompt }),
     });
-    const payload = await response.json() as GenerateScenarioResponse;
+    const payload = (await response.json()) as GenerateScenarioResponse;
     if (!response.ok || !payload.ok || !payload.scenario) {
-      if (payload.mode === "chat" || payload.mode === "needs_details") {
+      if (
+        payload.mode === "chat" ||
+        payload.mode === "needs_details" ||
+        payload.mode === "out_of_scope" ||
+        payload.mode === "security_refusal"
+      ) {
         return {
           mode: payload.mode,
           message: payload.message,
@@ -146,6 +171,7 @@ async function generateScenarioWithAgent(
 
 export function GenAIScenarioGenerator() {
   const { active, setActive, generateFromPrompt } = useActiveScenario();
+  const { saveScenario } = usePulseStore();
   const [input, setInput] = useState("");
   const [generating, setGenerating] = useState(false);
   const [step, setStep] = useState(0);
@@ -158,7 +184,9 @@ export function GenAIScenarioGenerator() {
   const start = (prompt: string) => {
     const text = prompt.trim();
     if (!text) {
-      toast.error("Scrie intai situatia", { description: "Include sectia, pacientii, personalul si problema principala." });
+      toast.error("Scrie intai situatia", {
+        description: "Include sectia, pacientii, personalul si problema principala.",
+      });
       taRef.current?.focus();
       return;
     }
@@ -174,35 +202,52 @@ export function GenAIScenarioGenerator() {
     GEN_STEPS.forEach((_, i) => {
       window.setTimeout(() => setStep(i + 1), (i + 1) * 320);
     });
-    window.setTimeout(async () => {
-      const result = await generateScenarioWithAgent(text, generateFromPrompt);
-      setAssistantReply(result);
-      if (result.mode === "scenario" && result.scenario) {
-        setPending(result.scenario);
-      }
-      setChatMessages((messages) => [
-        ...messages,
-        {
-          id: `a-${Date.now()}`,
-          role: "assistant",
-          content: result.message ?? (result.mode === "scenario" ? "Am generat scenariul si am actualizat panoul de analiza." : "Sunt aici sa te ajut."),
-          meta: result.mode === "scenario" ? "Scenariu generat" : result.mode === "needs_details" ? "Cere detalii" : "Conversatie",
-        },
-      ]);
-      setGenerating(false);
-      toast.success(result.mode === "scenario" ? "Scenariu generat" : "Agentul a raspuns", {
-        description: result.mode === "scenario" ? result.scenario?.name : result.message,
-      });
-      if (result.agentError) {
-        toast.warning("Agentul Foundry nu a fost folosit", {
-          description: "Am folosit generatorul local ca fallback.",
+    window.setTimeout(
+      async () => {
+        const result = await generateScenarioWithAgent(text, generateFromPrompt);
+        setAssistantReply(result);
+        if (result.mode === "scenario" && result.scenario) {
+          setPending(result.scenario);
+        }
+        setChatMessages((messages) => [
+          ...messages,
+          {
+            id: `a-${Date.now()}`,
+            role: "assistant",
+            content:
+              result.message ??
+              (result.mode === "scenario"
+                ? "Am generat scenariul si am actualizat panoul de analiza."
+                : "Sunt aici sa te ajut."),
+            meta:
+              result.mode === "scenario"
+                ? "Scenariu generat"
+                : result.mode === "needs_details"
+                  ? "Cere detalii"
+                  : result.mode === "security_refusal"
+                    ? "Refuz securitate"
+                    : result.mode === "out_of_scope"
+                      ? "In afara domeniului"
+                      : "Conversatie",
+          },
+        ]);
+        setGenerating(false);
+        toast.success(result.mode === "scenario" ? "Scenariu generat" : "Agentul a raspuns", {
+          description: result.mode === "scenario" ? result.scenario?.name : result.message,
         });
-      }
-    }, GEN_STEPS.length * 320 + 250);
+        if (result.agentError) {
+          toast.warning("Agentul a folosit fallback local", {
+            description: "Raspunsul a ramas limitat la domeniul PulseGuard AI.",
+          });
+        }
+      },
+      GEN_STEPS.length * 320 + 250,
+    );
   };
 
   const apply = (scenario: GeneratScenario) => {
     setActive(scenario);
+    saveScenario(scenario);
     toast.success("Panoul a fost actualizat", {
       description: `${scenario.name} - ${scenario.department}`,
     });
@@ -222,7 +267,9 @@ export function GenAIScenarioGenerator() {
     taRef.current?.focus();
   };
 
-  useEffect(() => { taRef.current?.focus(); }, []);
+  useEffect(() => {
+    taRef.current?.focus();
+  }, []);
 
   return (
     <div className="flex flex-col gap-5">
@@ -235,10 +282,15 @@ export function GenAIScenarioGenerator() {
           <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-success ring-2 ring-background animate-pulse-soft" />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">PulseGuard GenAI - Engine v2.4</div>
-          <h2 className="mt-0.5 text-base font-semibold leading-tight">Agent Conversational GenAI</h2>
+          <div className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+            PulseGuard GenAI - Engine v2.4
+          </div>
+          <h2 className="mt-0.5 text-base font-semibold leading-tight">
+            Agent Conversational GenAI
+          </h2>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            Poti saluta, poti cere ajutor sau poti descrie problema spitalului. Agentul raspunde si genereaza scenarii cand are date suficiente.
+            Poti saluta, poti cere ajutor sau poti descrie problema spitalului. Agentul raspunde si
+            genereaza scenarii cand are date suficiente.
           </p>
         </div>
       </header>
@@ -281,13 +333,23 @@ export function GenAIScenarioGenerator() {
           disabled={generating}
           className="btn-glow inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[var(--cyan-glow)] to-[var(--indigo-glow)] px-4 py-2 text-xs font-semibold text-background ring-glow disabled:opacity-70"
         >
-          {generating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Wand2 className="h-3.5 w-3.5" />}
+          {generating ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Wand2 className="h-3.5 w-3.5" />
+          )}
           {generating ? "Agentul raspunde..." : "Trimite mesaj"}
         </button>
-        <button onClick={useExample} className="inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-secondary/40 px-3 py-2 text-xs hover:bg-secondary/70 transition">
+        <button
+          onClick={useExample}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-secondary/40 px-3 py-2 text-xs hover:bg-secondary/70 transition"
+        >
           <Lightbulb className="h-3.5 w-3.5 text-[var(--cyan-glow)]" /> Exemplu
         </button>
-        <button onClick={clear} className="inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-secondary/40 px-3 py-2 text-xs hover:bg-secondary/70 transition">
+        <button
+          onClick={clear}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-secondary/40 px-3 py-2 text-xs hover:bg-secondary/70 transition"
+        >
           <Eraser className="h-3.5 w-3.5" /> Sterge
         </button>
       </div>
@@ -303,13 +365,20 @@ export function GenAIScenarioGenerator() {
               const done = i < step;
               const active = i === step;
               return (
-                <li key={s} className={cn(
-                  "flex items-center gap-2.5 text-sm transition-opacity",
-                  !done && !active && "opacity-40"
-                )}>
-                  {done ? <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
-                    : active ? <Loader2 className="h-4 w-4 text-[var(--cyan-glow)] shrink-0 animate-spin" />
-                    : <span className="h-4 w-4 rounded-full border border-border/60 shrink-0" />}
+                <li
+                  key={s}
+                  className={cn(
+                    "flex items-center gap-2.5 text-sm transition-opacity",
+                    !done && !active && "opacity-40",
+                  )}
+                >
+                  {done ? (
+                    <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
+                  ) : active ? (
+                    <Loader2 className="h-4 w-4 text-[var(--cyan-glow)] shrink-0 animate-spin" />
+                  ) : (
+                    <span className="h-4 w-4 rounded-full border border-border/60 shrink-0" />
+                  )}
                   <span className={cn(active && "text-foreground caret")}>{s}</span>
                 </li>
               );
@@ -319,8 +388,21 @@ export function GenAIScenarioGenerator() {
       )}
 
       {/* Result panel */}
-      {chatMessages.length > 0 && <ChatThread messages={chatMessages} latestReply={assistantReply} generating={generating} />}
-      {pending && !generating && <ResultPanel scenario={pending} active={active} onAplica={() => apply(pending)} onRegenerate={() => start(pending.prompt)} onReport={() => { apply(pending); navigate({ to: "/forecast-report" }); }} />}
+      {chatMessages.length > 0 && (
+        <ChatThread messages={chatMessages} latestReply={assistantReply} generating={generating} />
+      )}
+      {pending && !generating && (
+        <ResultPanel
+          scenario={pending}
+          active={active}
+          onAplica={() => apply(pending)}
+          onRegenerate={() => start(pending.prompt)}
+          onReport={() => {
+            apply(pending);
+            navigate({ to: "/forecast-report" });
+          }}
+        />
+      )}
 
       {/* Empty state */}
       {!pending && chatMessages.length === 0 && !generating && !active && (
@@ -328,7 +410,8 @@ export function GenAIScenarioGenerator() {
           <FlaskConical className="mx-auto h-6 w-6 text-[var(--cyan-glow)]" />
           <div className="mt-2 text-sm font-medium">Agentul este pregatit</div>
           <p className="mt-1 text-xs text-muted-foreground max-w-md mx-auto">
-            Scrie un mesaj simplu sau descrie situatia echipei. Agentul raspunde conversational si genereaza scenariu cand are destule date.
+            Scrie un mesaj simplu sau descrie situatia echipei. Agentul raspunde conversational si
+            genereaza scenariu cand are destule date.
           </p>
         </div>
       )}
@@ -338,11 +421,21 @@ export function GenAIScenarioGenerator() {
         <div className="rounded-2xl border border-border/60 bg-secondary/20 p-4 flex items-start gap-3">
           <ShieldAlert className="h-4 w-4 text-[var(--cyan-glow)] mt-0.5 shrink-0" />
           <div className="flex-1 min-w-0">
-            <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Scenariu activ</div>
+            <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              Scenariu activ
+            </div>
             <div className="text-sm font-medium truncate">{active.name}</div>
-            <div className="text-[11px] text-muted-foreground">{active.department} - risc {active.riskScore}/100 - incredere {active.confidenceScore}%</div>
+            <div className="text-[11px] text-muted-foreground">
+              {active.department} - risc {active.riskScore}/100 - incredere {active.confidenceScore}
+              %
+            </div>
           </div>
-          <button onClick={() => setActive(null)} className="text-[11px] text-muted-foreground hover:text-foreground transition">Sterge</button>
+          <button
+            onClick={() => setActive(null)}
+            className="text-[11px] text-muted-foreground hover:text-foreground transition"
+          >
+            Sterge
+          </button>
         </div>
       )}
     </div>
@@ -381,10 +474,7 @@ function ChatThread({
         {messages.map((message) => (
           <div
             key={message.id}
-            className={cn(
-              "flex",
-              message.role === "user" ? "justify-end" : "justify-start",
-            )}
+            className={cn("flex", message.role === "user" ? "justify-end" : "justify-start")}
           >
             <div
               className={cn(
@@ -395,7 +485,9 @@ function ChatThread({
               )}
             >
               {message.meta && (
-                <div className="mb-1 text-[10px] uppercase tracking-[0.16em] opacity-70">{message.meta}</div>
+                <div className="mb-1 text-[10px] uppercase tracking-[0.16em] opacity-70">
+                  {message.meta}
+                </div>
               )}
               {message.content}
             </div>
@@ -413,10 +505,15 @@ function ChatThread({
 
       {latestReply?.missingInfo.length ? (
         <section className="rounded-xl border border-border/60 bg-secondary/20 p-3.5">
-          <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Date utile pentru scenariu</div>
+          <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+            Date utile pentru scenariu
+          </div>
           <ul className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-1.5">
             {latestReply.missingInfo.map((item) => (
-              <li key={item} className="flex items-start gap-2 rounded-lg border border-border/60 bg-secondary/30 p-2 text-[11px] leading-relaxed">
+              <li
+                key={item}
+                className="flex items-start gap-2 rounded-lg border border-border/60 bg-secondary/30 p-2 text-[11px] leading-relaxed"
+              >
                 <CheckCircle2 className="h-3 w-3 mt-0.5 text-[var(--cyan-glow)] shrink-0" /> {item}
               </li>
             ))}
@@ -428,7 +525,11 @@ function ChatThread({
 }
 
 function ResultPanel({
-  scenario, active, onAplica, onRegenerate, onReport,
+  scenario,
+  active,
+  onAplica,
+  onRegenerate,
+  onReport,
 }: {
   scenario: GeneratScenario;
   active: GeneratScenario | null;
@@ -451,10 +552,13 @@ function ResultPanel({
     critical: "critic",
   };
   const riskTone =
-    scenario.riskLevel === "critical" ? "bg-danger/15 text-danger border-danger/30" :
-    scenario.riskLevel === "elevated" ? "bg-warning/15 text-warning border-warning/30" :
-    scenario.riskLevel === "moderate" ? "bg-warning/10 text-warning border-warning/20" :
-    "bg-success/15 text-success border-success/30";
+    scenario.riskLevel === "critical"
+      ? "bg-danger/15 text-danger border-danger/30"
+      : scenario.riskLevel === "elevated"
+        ? "bg-warning/15 text-warning border-warning/30"
+        : scenario.riskLevel === "moderate"
+          ? "bg-warning/10 text-warning border-warning/20"
+          : "bg-success/15 text-success border-success/30";
 
   return (
     <article className="rounded-2xl border border-border/60 glass-strong p-5 animate-fade-up space-y-4">
@@ -476,11 +580,23 @@ function ResultPanel({
             <span>-</span>
             <span>Incredere {scenario.confidenceScore}%</span>
             <span>-</span>
-            <span suppressHydrationWarning>Generat {new Date(scenario.generatedAt).toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" })}</span>
+            <span suppressHydrationWarning>
+              Generat{" "}
+              {new Date(scenario.generatedAt).toLocaleTimeString("ro-RO", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
           </div>
         </div>
-        <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium border self-start", riskTone)}>
-          <Activity className="h-3.5 w-3.5" /> {riskLabel[scenario.riskLevel]} - {scenario.riskScore}/100
+        <span
+          className={cn(
+            "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium border self-start",
+            riskTone,
+          )}
+        >
+          <Activity className="h-3.5 w-3.5" /> {riskLabel[scenario.riskLevel]} -{" "}
+          {scenario.riskScore}/100
         </span>
       </header>
 
@@ -493,25 +609,37 @@ function ResultPanel({
           { label: "Urgenta interventie", v: scenario.interventionUrgency },
         ].map((k) => (
           <div key={k.label} className="rounded-lg border border-border/60 bg-secondary/30 p-2.5">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{k.label}</div>
-            <div className="mt-0.5 text-lg font-semibold tabular-nums">{k.v}<span className="text-[10px] text-muted-foreground">/100</span></div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              {k.label}
+            </div>
+            <div className="mt-0.5 text-lg font-semibold tabular-nums">
+              {k.v}
+              <span className="text-[10px] text-muted-foreground">/100</span>
+            </div>
           </div>
         ))}
       </div>
 
       {/* Explanation */}
       <section className="rounded-xl border border-border/60 bg-secondary/20 p-3.5">
-        <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Explicatia agentului</div>
+        <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+          Explicatia agentului
+        </div>
         <p className="mt-1.5 text-sm leading-relaxed text-foreground/90">{scenario.explanation}</p>
         <p className="mt-2 text-xs text-muted-foreground italic">{scenario.expectedImpact}</p>
       </section>
 
       {scenario.decisionBasis.length > 0 && (
         <section className="rounded-xl border border-border/60 bg-secondary/20 p-3.5">
-          <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">De unde vin deciziile</div>
+          <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+            De unde vin deciziile
+          </div>
           <ul className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-1.5">
             {scenario.decisionBasis.map((item) => (
-              <li key={item} className="flex items-start gap-2 rounded-lg border border-border/60 bg-secondary/30 p-2 text-[11px] leading-relaxed">
+              <li
+                key={item}
+                className="flex items-start gap-2 rounded-lg border border-border/60 bg-secondary/30 p-2 text-[11px] leading-relaxed"
+              >
                 <CheckCircle2 className="h-3 w-3 mt-0.5 text-[var(--cyan-glow)] shrink-0" /> {item}
               </li>
             ))}
@@ -522,35 +650,59 @@ function ResultPanel({
       {/* Drivers + recomandari */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         <section className="rounded-xl border border-border/60 bg-secondary/20 p-3.5">
-          <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Factori principali</div>
+          <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+            Factori principali
+          </div>
           <ul className="mt-2 space-y-2">
             {scenario.primaryDrivers.map((d, i) => (
-              <li key={i} className="rounded-lg border border-border/60 bg-secondary/30 p-2.5 animate-stagger" style={{ animationDelay: `${i * 0.06}s` }}>
+              <li
+                key={i}
+                className="rounded-lg border border-border/60 bg-secondary/30 p-2.5 animate-stagger"
+                style={{ animationDelay: `${i * 0.06}s` }}
+              >
                 <div className="flex items-center justify-between gap-2">
                   <div className="text-sm font-medium">{d.driverName}</div>
-                  <span className={cn(
-                    "text-[9px] uppercase tracking-wider rounded-full px-1.5 py-0.5 border",
-                    d.severity === "critical" ? "border-danger/40 text-danger bg-danger/10" :
-                    d.severity === "high" ? "border-warning/40 text-warning bg-warning/10" :
-                    "border-border/60 text-muted-foreground bg-secondary/40"
-                  )}>{severityLabel[d.severity] ?? d.severity}</span>
+                  <span
+                    className={cn(
+                      "text-[9px] uppercase tracking-wider rounded-full px-1.5 py-0.5 border",
+                      d.severity === "critical"
+                        ? "border-danger/40 text-danger bg-danger/10"
+                        : d.severity === "high"
+                          ? "border-warning/40 text-warning bg-warning/10"
+                          : "border-border/60 text-muted-foreground bg-secondary/40",
+                    )}
+                  >
+                    {severityLabel[d.severity] ?? d.severity}
+                  </span>
                 </div>
-                <p className="mt-1 text-[11px] text-muted-foreground leading-relaxed">{d.explanation}</p>
+                <p className="mt-1 text-[11px] text-muted-foreground leading-relaxed">
+                  {d.explanation}
+                </p>
               </li>
             ))}
           </ul>
         </section>
 
         <section className="rounded-xl border border-border/60 bg-secondary/20 p-3.5">
-          <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Recomandari</div>
+          <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+            Recomandari
+          </div>
           <ol className="mt-2 space-y-2">
             {scenario.recommendations.map((r, i) => (
-              <li key={i} className="rounded-lg border border-border/60 bg-secondary/30 p-2.5 flex gap-2.5 animate-stagger" style={{ animationDelay: `${i * 0.06}s` }}>
-                <span className="grid h-5 w-5 shrink-0 place-items-center rounded-md bg-secondary text-[10px] font-semibold">{i + 1}</span>
+              <li
+                key={i}
+                className="rounded-lg border border-border/60 bg-secondary/30 p-2.5 flex gap-2.5 animate-stagger"
+                style={{ animationDelay: `${i * 0.06}s` }}
+              >
+                <span className="grid h-5 w-5 shrink-0 place-items-center rounded-md bg-secondary text-[10px] font-semibold">
+                  {i + 1}
+                </span>
                 <div className="min-w-0">
                   <div className="text-sm font-medium leading-tight">{r.title}</div>
                   <div className="text-[11px] text-muted-foreground mt-0.5">{r.description}</div>
-                  <div className="mt-1 inline-flex items-center gap-1 text-[10px] text-[var(--cyan-glow)]">{r.expectedImpact}</div>
+                  <div className="mt-1 inline-flex items-center gap-1 text-[10px] text-[var(--cyan-glow)]">
+                    {r.expectedImpact}
+                  </div>
                 </div>
               </li>
             ))}
@@ -560,10 +712,15 @@ function ResultPanel({
 
       {/* Follow-up indicators */}
       <section className="rounded-xl border border-border/60 bg-secondary/20 p-3.5">
-        <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Indicatori de urmarit</div>
+        <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+          Indicatori de urmarit
+        </div>
         <ul className="mt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5">
           {scenario.followUpIndicators.map((s) => (
-            <li key={s} className="flex items-start gap-2 rounded-lg border border-border/60 bg-secondary/30 p-2 text-[11px]">
+            <li
+              key={s}
+              className="flex items-start gap-2 rounded-lg border border-border/60 bg-secondary/30 p-2 text-[11px]"
+            >
               <CheckCircle2 className="h-3 w-3 mt-0.5 text-success shrink-0" /> {s}
             </li>
           ))}
@@ -577,24 +734,37 @@ function ResultPanel({
           disabled={isApplied}
           className="btn-glow inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[var(--cyan-glow)] to-[var(--indigo-glow)] px-3.5 py-2 text-xs font-semibold text-background ring-glow disabled:opacity-60"
         >
-          <ArrowRight className="h-3.5 w-3.5" /> {isApplied ? "Aplicat in panou" : "Aplica in panou"}
+          <ArrowRight className="h-3.5 w-3.5" />{" "}
+          {isApplied ? "Aplicat in panou" : "Aplica in panou"}
         </button>
-        <button onClick={onReport} className="btn-glow inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-secondary/40 px-3.5 py-2 text-xs hover:bg-secondary/70 transition">
+        <button
+          onClick={onReport}
+          className="btn-glow inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-secondary/40 px-3.5 py-2 text-xs hover:bg-secondary/70 transition"
+        >
           <FileText className="h-3.5 w-3.5" /> Genereaza raport
         </button>
-        <button onClick={onRegenerate} className="btn-glow inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-secondary/40 px-3.5 py-2 text-xs hover:bg-secondary/70 transition">
+        <button
+          onClick={onRegenerate}
+          className="btn-glow inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-secondary/40 px-3.5 py-2 text-xs hover:bg-secondary/70 transition"
+        >
           <RotateCw className="h-3.5 w-3.5" /> Regenerare
         </button>
-        <button onClick={() => toast.success("Scenariu salvat", { description: scenario.name })} className="btn-glow inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-secondary/40 px-3.5 py-2 text-xs hover:bg-secondary/70 transition">
+        <button
+          onClick={() => {
+            onAplica();
+            toast.success("Scenariu salvat", { description: scenario.name });
+          }}
+          className="btn-glow inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-secondary/40 px-3.5 py-2 text-xs hover:bg-secondary/70 transition"
+        >
           <Save className="h-3.5 w-3.5" /> Salveaza
         </button>
-        <button onClick={() => toast("Scenariu exportat", { description: `${scenario.name}.json` })} className="btn-glow inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-secondary/40 px-3.5 py-2 text-xs hover:bg-secondary/70 transition">
+        <button
+          onClick={() => toast("Scenariu exportat", { description: `${scenario.name}.json` })}
+          className="btn-glow inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-secondary/40 px-3.5 py-2 text-xs hover:bg-secondary/70 transition"
+        >
           <Download className="h-3.5 w-3.5" /> Exporta
         </button>
       </footer>
     </article>
   );
 }
-
-
-

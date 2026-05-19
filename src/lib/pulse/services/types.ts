@@ -47,7 +47,9 @@ export type TimeSeriesInput = {
 export type ForecastOutput = {
   date: string;
   predictedBurnoutRisk: number; // 0-100
+  predictedEpuizareRisk: number; // Romanian UI alias, 0-100
   predictedFatigueIndex: number; // 0-100
+  predictedObosealaIndex: number; // Romanian UI alias, 0-100
   predictedStaffDeficitRisk: number; // 0-100
   confidenceLow: number;
   confidenceRidicat: number;
@@ -111,9 +113,14 @@ export type NotificationSetari = {
   pushAlerts: boolean;
   criticalOnly: boolean;
   weeklyDigest: boolean;
+  smsAlerts?: boolean;
+  inAppAlerts?: boolean;
 };
 
 export type ThemeMode = "light" | "dark" | "system" | "high-contrast";
+export type AlertSensitivity = "low" | "medium" | "high";
+export type TelemetrySimulationMode = "normal" | "busy" | "critical";
+export type AiProviderStatus = "online" | "degraded" | "offline";
 
 export type UserPreferences = {
   selectedTheme: ThemeMode;
@@ -121,5 +128,14 @@ export type UserPreferences = {
   selectedCoordinator: string; // coordinator name
   reducedMotion: boolean;
   notificationSetari: NotificationSetari;
+  organizationName: string;
+  organizationUnitName: string;
+  defaultDepartment: string;
+  coordinatorName: string;
+  alertSensitivity: AlertSensitivity;
+  telemetrySimulationMode: TelemetrySimulationMode;
+  aiProviderStatus: AiProviderStatus;
+  privacyAcknowledged: boolean;
+  complianceDisclaimerEnabled: boolean;
+  themePreference: ThemeMode;
 };
-

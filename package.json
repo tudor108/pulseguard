@@ -12,7 +12,8 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "deploy:gcp": "bash ./deploy.sh"
+    "deploy:gcp": "bash ./deploy.sh",
+    "deploy:local": "powershell -ExecutionPolicy Bypass -File ./deploy-local.ps1"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.25.5",

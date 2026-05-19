@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useRouterState } from "@tanstack/react-router";
 
 type Phase = "idle" | "enter" | "hold" | "exit";
@@ -74,8 +74,8 @@ export function RouteSplash() {
     const isFirst = firstRender.current;
     firstRender.current = false;
     const enterMs = isFirst ? 280 : 220;
-    const holdMs  = isFirst ? 1480 : 1320;
-    const exitMs  = 460;
+    const holdMs = isFirst ? 1480 : 1320;
+    const exitMs = 460;
 
     setPhase("enter");
     timers.current.push(
@@ -106,7 +106,7 @@ export function RouteSplash() {
       {!reduced && (
         <div key={`particles-${runKey}`} className="splash-particles" aria-hidden>
           {Array.from({ length: 10 }).map((_, i) => (
-            <span key={i} style={{ ['--i' as any]: i }} />
+            <span key={i} style={{ "--i": i } as CSSProperties} />
           ))}
         </div>
       )}
@@ -118,17 +118,25 @@ export function RouteSplash() {
           <div className="splash-sweep" />
           <div className="splash-logo">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" className="text-background">
-              <path d="M2 12h4l2-6 4 12 3-8 2 4h5" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M2 12h4l2-6 4 12 3-8 2 4h5"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </div>
         </div>
 
         <div className="splash-title">
           {"PulseGuard".split("").map((ch, i) => (
-            <span key={i} className="splash-char" style={{ ['--d' as any]: `${i * 28}ms` }}>{ch}</span>
+            <span key={i} className="splash-char" style={{ "--d": `${i * 28}ms` } as CSSProperties}>
+              {ch}
+            </span>
           ))}
         </div>
-        <div className="splash-subtitle">AI  -  HEALTHCARE INTELLIGENCE</div>
+        <div className="splash-subtitle">AI - HEALTHCARE INTELLIGENCE</div>
       </div>
     </div>
   );

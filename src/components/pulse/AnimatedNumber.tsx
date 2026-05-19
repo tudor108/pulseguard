@@ -1,13 +1,26 @@
 import { useEffect, useRef, useState } from "react";
 
-export function AnimatedNumber({ value, duration = 900, decimals = 0 }: { value: number; duration?: number; decimals?: number }) {
+export function AnimatedNumber({
+  value,
+  duration = 900,
+  decimals = 0,
+}: {
+  value: number;
+  duration?: number;
+  decimals?: number;
+}) {
   const [display, setDisplay] = useState(0);
   const startRef = useRef<number | null>(null);
   const fromRef = useRef(0);
 
   useEffect(() => {
-    const reduce = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) { setDisplay(value); return; }
+    const reduce =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      setDisplay(value);
+      return;
+    }
     fromRef.current = display;
     startRef.current = null;
     let raf = 0;

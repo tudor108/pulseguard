@@ -4,6 +4,7 @@ import avatarFemale from "@/assets/avatar-female.jpg";
 import avatarFemaleOps from "@/assets/avatar-female-ops.jpg";
 import avatarMale from "@/assets/avatar-male.jpg";
 import avatarMaleOps from "@/assets/avatar-male-ops.jpg";
+import { loadProfileSelection, saveProfileSelection } from "./services/profile-service";
 
 export const UNITS = [
   "Unitate Terapie Intensiva",
@@ -17,15 +18,60 @@ export const UNITS = [
 export type Gender = "female" | "male";
 
 export const COORDINATORS = [
-  { name: "Dr. Emily Carter",                role: "Coordonator operatiuni clinice", unit: "Unitate Terapie Intensiva",  gender: "female" as Gender, avatar: avatarEmily,     email: "emily.carter@pulseguard.health",  phone: "+1 (415) 555-0142", timezone: "America/Los_Angeles" },
-  { name: "Dr. James Morgan",                role: "Medic coordonator",              unit: "Departament Urgente", gender: "male"   as Gender, avatar: avatarMale,      email: "james.morgan@pulseguard.health",  phone: "+1 (212) 555-0188", timezone: "America/New_York" },
-  { name: "Dr. Sofia Bennett",               role: "Sef departament",                unit: "Sectie Chirurgie",        gender: "female" as Gender, avatar: avatarFemaleOps, email: "sofia.bennett@pulseguard.health", phone: "+1 (617) 555-0119", timezone: "America/New_York" },
-  { name: "Nurse Lead Olivia Hayes",         role: "Asistent sef",                   unit: "Pediatrie",           gender: "female" as Gender, avatar: avatarFemale,    email: "olivia.hayes@pulseguard.health",  phone: "+1 (312) 555-0167", timezone: "America/Chicago" },
-  { name: "Operations Manager Daniel Price", role: "Manager operatiuni",             unit: "Multi-sectie Prezentare",  gender: "male"   as Gender, avatar: avatarMaleOps,   email: "daniel.price@pulseguard.health",  phone: "+1 (206) 555-0124", timezone: "America/Los_Angeles" },
+  {
+    name: "Dr. Emily Carter",
+    role: "Coordonator operatiuni clinice",
+    unit: "Unitate Terapie Intensiva",
+    gender: "female" as Gender,
+    avatar: avatarEmily,
+    email: "emily.carter@pulseguard.health",
+    phone: "+1 (415) 555-0142",
+    timezone: "America/Los_Angeles",
+  },
+  {
+    name: "Dr. James Morgan",
+    role: "Medic coordonator",
+    unit: "Departament Urgente",
+    gender: "male" as Gender,
+    avatar: avatarMale,
+    email: "james.morgan@pulseguard.health",
+    phone: "+1 (212) 555-0188",
+    timezone: "America/New_York",
+  },
+  {
+    name: "Dr. Sofia Bennett",
+    role: "Sef departament",
+    unit: "Sectie Chirurgie",
+    gender: "female" as Gender,
+    avatar: avatarFemaleOps,
+    email: "sofia.bennett@pulseguard.health",
+    phone: "+1 (617) 555-0119",
+    timezone: "America/New_York",
+  },
+  {
+    name: "Nurse Lead Olivia Hayes",
+    role: "Asistent sef",
+    unit: "Pediatrie",
+    gender: "female" as Gender,
+    avatar: avatarFemale,
+    email: "olivia.hayes@pulseguard.health",
+    phone: "+1 (312) 555-0167",
+    timezone: "America/Chicago",
+  },
+  {
+    name: "Operations Manager Daniel Price",
+    role: "Manager operatiuni",
+    unit: "Multi-sectie Prezentare",
+    gender: "male" as Gender,
+    avatar: avatarMaleOps,
+    email: "daniel.price@pulseguard.health",
+    phone: "+1 (206) 555-0124",
+    timezone: "America/Los_Angeles",
+  },
 ] as const;
 
-export type Unit = typeof UNITS[number];
-export type Coordinator = typeof COORDINATORS[number]["name"];
+export type Unit = (typeof UNITS)[number];
+export type Coordinator = (typeof COORDINATORS)[number]["name"];
 export type Theme = "light" | "dark" | "system" | "high-contrast";
 
 export function getCoordinator(name: Coordinator) {
@@ -63,22 +109,38 @@ export function ProfilProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("dark");
 
   useEffect(() => {
-    try {
-      const u = localStorage.getItem("pg:unit") as Unit | null;
-      const c = localStorage.getItem("pg:coord") as Coordinator | null;
-      const t = (localStorage.getItem("pg:theme") as Theme | null) || "dark";
-      if (u) setUnitState(u);
-      if (c) setCoordinatorState(c);
-      setThemeState(t);
-      applyTheme(t);
-    } catch {}
+    const saved = loadProfileSelection({
+      unit: "Unitate Terapie Intensiva",
+      coordinator: "Dr. Emily Carter",
+      theme: "dark",
+    });
+    if (UNITS.includes(saved.unit as Unit)) setUnitState(saved.unit as Unit);
+    if (COORDINATORS.some((item) => item.name === saved.coordinator)) {
+      setCoordinatorState(saved.coordinator as Coordinator);
+    }
+    setThemeState(saved.theme as Theme);
+    applyTheme(saved.theme as Theme);
   }, []);
 
-  const setUnit = (u: Unit) => { setUnitState(u); try { localStorage.setItem("pg:unit", u); } catch {} };
-  const setCoordinator = (c: Coordinator) => { setCoordinatorState(c); try { localStorage.setItem("pg:coord", c); } catch {} };
-  const setTheme = (t: Theme) => { setThemeState(t); applyTheme(t); try { localStorage.setItem("pg:theme", t); } catch {} };
+  const setUnit = (u: Unit) => {
+    setUnitState(u);
+    saveProfileSelection({ unit: u });
+  };
+  const setCoordinator = (c: Coordinator) => {
+    setCoordinatorState(c);
+    saveProfileSelection({ coordinator: c });
+  };
+  const setTheme = (t: Theme) => {
+    setThemeState(t);
+    applyTheme(t);
+    saveProfileSelection({ theme: t });
+  };
 
-  return <Ctx.Provider value={{ unit, coordinator, theme, setUnit, setCoordinator, setTheme }}>{children}</Ctx.Provider>;
+  return (
+    <Ctx.Provider value={{ unit, coordinator, theme, setUnit, setCoordinator, setTheme }}>
+      {children}
+    </Ctx.Provider>
+  );
 }
 
 export function useProfil() {

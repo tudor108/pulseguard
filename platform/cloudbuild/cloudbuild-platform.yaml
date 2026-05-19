@@ -1,0 +1,51 @@
+substitutions:
+  _REGION: us-central1
+  _REPO: pulseguard
+  _CLUSTER: pulseguard-autopilot
+  _CLUSTER_REGION: us-central1
+
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/telemetry-generator:$SHORT_SHA
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/telemetry-generator:latest
+      - platform/services/telemetry-generator
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/realtime-gateway:$SHORT_SHA
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/realtime-gateway:latest
+      - platform/services/realtime-gateway
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/ml-inference:$SHORT_SHA
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/ml-inference:latest
+      - platform/services/ml-inference
+
+  - name: gcr.io/cloud-builders/kubectl
+    args:
+      - apply
+      - -k
+      - platform/k8s
+    env:
+      - CLOUDSDK_COMPUTE_REGION=${_CLUSTER_REGION}
+      - CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER}
+
+images:
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/telemetry-generator:$SHORT_SHA
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/telemetry-generator:latest
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/realtime-gateway:$SHORT_SHA
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/realtime-gateway:latest
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/ml-inference:$SHORT_SHA
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/ml-inference:latest
+

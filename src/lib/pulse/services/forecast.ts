@@ -17,7 +17,9 @@ export function buildForecastOutput(historyDays = 30, forecastDays = 14): Foreca
     out.push({
       date: d.toISOString().slice(0, 10),
       predictedBurnoutRisk: burnout,
+      predictedEpuizareRisk: burnout,
       predictedFatigueIndex: fatigue,
+      predictedObosealaIndex: fatigue,
       predictedStaffDeficitRisk: shortage,
       confidenceLow: Math.max(0, burnout - band),
       confidenceRidicat: Math.min(100, burnout + band),
@@ -26,4 +28,3 @@ export function buildForecastOutput(historyDays = 30, forecastDays = 14): Foreca
   }
   return out;
 }
-

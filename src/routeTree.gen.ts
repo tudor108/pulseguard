@@ -14,6 +14,7 @@ import { Route as SimulatorRouteImport } from './routes/simulator'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RiskTrendsRouteImport } from './routes/risk-trends'
 import { Route as ReportsRouteImport } from './routes/reports'
+import { Route as LiveTelemetryRouteImport } from './routes/live-telemetry'
 import { Route as InterventionPlannerRouteImport } from './routes/intervention-planner'
 import { Route as GeneratorRouteImport } from './routes/generator'
 import { Route as ForecastReportRouteImport } from './routes/forecast-report'
@@ -45,6 +46,11 @@ const RiskTrendsRoute = RiskTrendsRouteImport.update({
 const ReportsRoute = ReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LiveTelemetryRoute = LiveTelemetryRouteImport.update({
+  id: '/live-telemetry',
+  path: '/live-telemetry',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InterventionPlannerRoute = InterventionPlannerRouteImport.update({
@@ -91,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/forecast-report': typeof ForecastReportRoute
   '/generator': typeof GeneratorRoute
   '/intervention-planner': typeof InterventionPlannerRoute
+  '/live-telemetry': typeof LiveTelemetryRoute
   '/reports': typeof ReportsRoute
   '/risk-trends': typeof RiskTrendsRoute
   '/settings': typeof SettingsRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/forecast-report': typeof ForecastReportRoute
   '/generator': typeof GeneratorRoute
   '/intervention-planner': typeof InterventionPlannerRoute
+  '/live-telemetry': typeof LiveTelemetryRoute
   '/reports': typeof ReportsRoute
   '/risk-trends': typeof RiskTrendsRoute
   '/settings': typeof SettingsRoute
@@ -120,6 +128,7 @@ export interface FileRoutesById {
   '/forecast-report': typeof ForecastReportRoute
   '/generator': typeof GeneratorRoute
   '/intervention-planner': typeof InterventionPlannerRoute
+  '/live-telemetry': typeof LiveTelemetryRoute
   '/reports': typeof ReportsRoute
   '/risk-trends': typeof RiskTrendsRoute
   '/settings': typeof SettingsRoute
@@ -136,6 +145,7 @@ export interface FileRouteTypes {
     | '/forecast-report'
     | '/generator'
     | '/intervention-planner'
+    | '/live-telemetry'
     | '/reports'
     | '/risk-trends'
     | '/settings'
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/forecast-report'
     | '/generator'
     | '/intervention-planner'
+    | '/live-telemetry'
     | '/reports'
     | '/risk-trends'
     | '/settings'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/forecast-report'
     | '/generator'
     | '/intervention-planner'
+    | '/live-telemetry'
     | '/reports'
     | '/risk-trends'
     | '/settings'
@@ -179,6 +191,7 @@ export interface RootRouteChildren {
   ForecastReportRoute: typeof ForecastReportRoute
   GeneratorRoute: typeof GeneratorRoute
   InterventionPlannerRoute: typeof InterventionPlannerRoute
+  LiveTelemetryRoute: typeof LiveTelemetryRoute
   ReportsRoute: typeof ReportsRoute
   RiskTrendsRoute: typeof RiskTrendsRoute
   SettingsRoute: typeof SettingsRoute
@@ -221,6 +234,13 @@ declare module '@tanstack/react-router' {
       path: '/reports'
       fullPath: '/reports'
       preLoaderRoute: typeof ReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/live-telemetry': {
+      id: '/live-telemetry'
+      path: '/live-telemetry'
+      fullPath: '/live-telemetry'
+      preLoaderRoute: typeof LiveTelemetryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/intervention-planner': {
@@ -283,6 +303,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForecastReportRoute: ForecastReportRoute,
   GeneratorRoute: GeneratorRoute,
   InterventionPlannerRoute: InterventionPlannerRoute,
+  LiveTelemetryRoute: LiveTelemetryRoute,
   ReportsRoute: ReportsRoute,
   RiskTrendsRoute: RiskTrendsRoute,
   SettingsRoute: SettingsRoute,

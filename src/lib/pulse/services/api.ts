@@ -25,8 +25,10 @@ import { reportsMock } from "./reports";
 import { scenariosMock } from "./scenarios";
 import { buildTimeSeries } from "./timeseries";
 import { loadPreferences, savePreferences } from "./preferences";
+import { loadAlerts } from "./alerts-service";
+import { loadSavedReports } from "./reports-service";
 
-const ok = <T,>(value: T, delay = 0): Promise<T> =>
+const ok = <T>(value: T, delay = 0): Promise<T> =>
   new Promise((resolve) => (delay ? setTimeout(() => resolve(value), delay) : resolve(value)));
 
 export const api = {
@@ -41,8 +43,11 @@ export const api = {
   // Time series + forecast
   getTimeSeries: (_departmentId?: string, days = 30): Promise<TimeSeriesInput[]> =>
     ok(buildTimeSeries(days)),
-  getForecast: (_departmentId?: string, historyDays = 30, forecastDays = 14): Promise<ForecastOutput[]> =>
-    ok(buildForecastOutput(historyDays, forecastDays)),
+  getForecast: (
+    _departmentId?: string,
+    historyDays = 30,
+    forecastDays = 14,
+  ): Promise<ForecastOutput[]> => ok(buildForecastOutput(historyDays, forecastDays)),
 
   // Scenarios
   listScenarios: (): Promise<Scenario[]> => ok(scenariosMock),
@@ -51,15 +56,16 @@ export const api = {
 
   // Rapoarte
   listRapoarte: (): Promise<Report[]> => ok(reportsMock),
+  listSavedRapoarte: () => ok(loadSavedReports()),
   getLatestReport: (): Promise<Report> => ok(reportsMock[0]),
 
   // Alerts
-  listAlerts: (): Promise<AlertItem[]> => ok(alertsMock),
+  listAlerts: (): Promise<AlertItem[]> =>
+    ok((loadAlerts().length ? loadAlerts() : alertsMock) as AlertItem[]),
 
   // Chat
   listChatMessages: (): Promise<ChatMessage[]> => ok(chatMessagesMock),
-  sendChatMessage: (content: string): Promise<ChatMessage> =>
-    ok(makeChatMessage("user", content)),
+  sendChatMessage: (content: string): Promise<ChatMessage> => ok(makeChatMessage("user", content)),
 
   // Preferences
   getPreferences: (): Promise<UserPreferences> => ok(loadPreferences()),

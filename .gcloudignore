@@ -9,6 +9,9 @@ dist
 .venv
 venv
 __pycache__
+__pycache__/
+*.py[cod]
+platform/
 
 npm-debug.log*
 yarn-debug.log*

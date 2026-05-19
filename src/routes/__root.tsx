@@ -12,6 +12,7 @@ import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
 import { ProfilProvider } from "@/lib/pulse/profile";
 import { ActiveScenarioProvider } from "@/lib/pulse/scenario-context";
+import { PulseStoreProvider } from "@/lib/pulse/app-state";
 import { RouteSplash } from "@/components/pulse/RouteSplash";
 
 function NotFoundComponent() {
@@ -77,10 +78,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "PulseGuard AI - Inteligenta operationala pentru spitale" },
-      { name: "description", content: "Prezice riscul de epuizare, prognozeaza presiunea pe personal si propune interventii ghidate de AI pentru spital." },
+      {
+        name: "description",
+        content:
+          "Prezice riscul de epuizare, prognozeaza presiunea pe personal si propune interventii ghidate de AI pentru spital.",
+      },
       { name: "author", content: "PulseGuard AI" },
       { property: "og:title", content: "PulseGuard AI - Inteligenta operationala pentru spitale" },
-      { property: "og:description", content: "Centru AI pentru operatiuni spital: prognoza risc epuizare, indice oboseala si recomandari de personal." },
+      {
+        property: "og:description",
+        content:
+          "Centru AI pentru operatiuni spital: prognoza risc epuizare, indice oboseala si recomandari de personal.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@PulseGuardAI" },
@@ -88,7 +97,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap",
+      },
       {
         rel: "stylesheet",
         href: appCss,
@@ -122,12 +134,13 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ProfilProvider>
         <ActiveScenarioProvider>
-          <RouteSplash />
-          <Outlet />
-          <Toaster richColors closeButton position="bottom-right" theme="dark" />
+          <PulseStoreProvider>
+            <RouteSplash />
+            <Outlet />
+            <Toaster richColors closeButton position="bottom-right" theme="dark" />
+          </PulseStoreProvider>
         </ActiveScenarioProvider>
       </ProfilProvider>
     </QueryClientProvider>
   );
 }
-
